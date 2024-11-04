@@ -12,3 +12,4 @@ yarn-error.log
 /.idea
 /.vscode
 git_token.txt
+.editorconfig
