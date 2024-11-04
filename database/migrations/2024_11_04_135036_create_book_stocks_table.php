@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('laralearns', function (Blueprint $table) {
+        Schema::create('book_stocks', function (Blueprint $table) {
             $table->id();
-            $table->string('nama')->nullable();;
-            $table->string('nik')->nullable();;
+            $table->integer('book_id')->nullable();
+            $table->integer('total')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('laralearns');
+        Schema::dropIfExists('book_stocks');
     }
 };
