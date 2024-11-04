@@ -1,0 +1,30 @@
+1. syntax untuk get data: 
+
+function getData() {
+    $.ajax({
+        url: '{{ route('users.datatable') }}',                      # nama route
+        type: 'GET',                                                # method request (GET/POST/PUT/PATCH/DELETE)
+        success: function(data) {
+            var user = data.data;                                   # response callback
+            console.log(data);
+
+            $.each(data.data, function(index, user) {               # loop response callback
+                var iteration = 1;
+                var row = '<tr>';                                   # simpan tag html dalam var
+                row += '<td><i class="fa-solid fa-gear"></i></td>'
+                row += '<td>' + iteration + '</td>'
+                row += '<td>' + user.name + '</td>'
+                row += '<td>' + user.email + '</td>'
+                row += '<td>' + user.email_verified_at + '</td>'    
+                row += '</tr>';
+                iteration++;
+                $('#dataTable').append(row);                        # append pada table panggil id table
+            });
+        },
+        error: function(errorData) {
+            console.log(errorData);
+        }
+    });
+}
+
+2. add data
