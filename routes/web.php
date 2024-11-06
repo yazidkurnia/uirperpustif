@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EmployeController;
 use App\Http\Controllers\ApiDataTable\ApiDataTableController;
+use App\Http\Controllers\CollagerController\CollagerController;
 
 Route::get('/', function () {
     $data['title'] = 'Dashboard';
@@ -26,6 +27,9 @@ Route::get('/employee', [EmployeController::class, 'index']);
 
 Route::get('/users', [UsersController::class, 'index']);
 
+Route::get('/collager', [CollagerController::class, 'index'])->name('list.collager');
+Route::get('/fetch-data-collager', [ApiDataTableController::class, 'api_datatable_collager'])->name('collagers.datatable');
+
 Route::get('/unit', function () {
     return view('unit');
 });
@@ -44,6 +48,7 @@ Route::get('/approval', function () {
 
 ############################################# all about setting account ########################################3
 Route::put('/update-user-role', [UsersController::class, 'user_update_role'])->name('user.update.role');
+Route::post('/set-account', [UsersController::class, 'set_account'])->name('setting.user.account');
 
 ############################################# api datatable #####################################################
 

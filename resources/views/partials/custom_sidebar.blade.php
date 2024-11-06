@@ -16,51 +16,28 @@
                 <div class="text-truncate" data-i18n="Dashboards">Dashboards</div>
             </a>
         </li>
-        <!-- Manajemen -->
+        {{-- Kegiatan --}}
         <li class="menu-item">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-layout"></i>
-                <div class="text-truncate" data-i18n="Layouts"> Manajemen </div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item">
-                    <a href="/fuel" class="menu-link">
-                        <div class="text-truncate" data-i18n="Without menu">Fuel Ticket</div>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="/anomali" class="menu-link">
-                        <div class="text-truncate" data-i18n="Without navbar">Anomali</div>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="/ticket" class="menu-link">
-                        <div class="text-truncate" data-i18n="Fluid">Ticket Book</div>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <!-- Karyawan -->
-        <li class="menu-item">
-            <a href="{{ url('/employee') }}" class="menu-link">
+            <a href="#" class="menu-link">
                 <i class="fa-solid fa-gear"></i>
-                <div class="text-truncate" data-i18n="Front Pages"> Karyawan </div>
+                <div class="text-truncate" data-i18n="Front Pages"> Kegiatan </div>
             </a>
         </li>
         <!-- Unit -->
         <li class="menu-item">
+            <a href="{{ route('list.collager') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-store"></i>
+                <div class="text-truncate" data-i18n="Front Pages">Peminjaman </div>
+            </a>
+        </li>
+        <li class="menu-item">
             <a href="/unit" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store"></i>
-                <div class="text-truncate" data-i18n="Front Pages">Unit </div>
+                <div class="text-truncate" data-i18n="Front Pages">Pengembalian </div>
             </a>
         </li>
-        <!-- Warehouse -->
-        <li class="menu-item">
-            <a href="/warehouse" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-store"></i>
-                <div class="text-truncate" data-i18n="Front Pages"> Warehouse </div>
-            </a>
-        </li>
+
+        {{-- khusus hak akses admin --}}
         <!-- Setting -->
         <li class="menu-header small text-uppercase"><span class="menu-header-text"> Setting </span></li>
         @if ($title == 'Setting Account')
@@ -93,6 +70,16 @@
             <a href="{{ url('/users') }}" class="menu-link">
                 <div class="text-truncate" data-i18n="Without navbar"> Users Account </div>
             </a>
+            </li>
+            <li class="menu-item">
+                <a href="/approval" class="menu-link">
+                    <div class="text-truncate" data-i18n="Without navbar"> Akun dosen </div>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="{{ route('list.collager') }}" class="menu-link">
+                    <div class="text-truncate" data-i18n="Without navbar"> Akun mahasiswa </div>
+                </a>
             </li>
         </ul>
         </li>

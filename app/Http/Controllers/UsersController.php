@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
 
 class UsersController extends Controller
@@ -45,5 +47,48 @@ class UsersController extends Controller
         $userById = User::find($validUserId);
         $userById->roleid = 1;
         $userById->save();
+    }
+
+    public function set_account(Request $request) {
+        $validCollagerId = $request->id != '' ? is_int((int)Crypt::decryptString($request->id)) == TRUE ? (int)Crypt::decryptString($request->id) != 0 ? (int)Crypt::decryptString($request->id) : NULL : NULL : NULL;
+        
+        if ($validCollagerId == NULL) {
+            return response()->json([
+                'success' => FALSE,
+                'message' => 'Terjadi kesalahan yang disebabkan oleh data mahasiswa.',
+                'data' => [],
+            ], 500);
+        }
+    
+        // Start a transaction
+        DB::beginTransaction();
+    
+        try {
+            User::create([
+                'name' => $request->nama,
+                'email' => $request->email,
+                'password' => Hash::make('password'),
+                'roleid' => 3,
+                'collagerid' => $validCollagerId,
+            ]);
+    
+            // Commit the transaction
+            DB::commit();
+    
+            return response()->json([
+                'success' => TRUE,
+                'message' => 'Berhasil menambahkan akun.',
+                'data' => [],
+            ], 200);
+        } catch (\Exception $e) {
+            // Rollback the transaction if something goes wrong
+            DB::rollBack();
+    
+            return response()->json([
+                'success' => FALSE,
+                'message' => 'Terjadi kesalahan saat menambahkan akun: ' . $e->getMessage(),
+                'data' => [],
+            ], 500);
+        }
     }
 }

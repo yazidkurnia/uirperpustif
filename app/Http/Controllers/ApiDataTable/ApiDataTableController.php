@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ApiDataTable;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\Collager\Collager;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 
@@ -34,6 +35,25 @@ class ApiDataTableController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Data pengguna berhasil diambil.',
+            'data' => $data,
+        ], 200);
+    }
+
+    public function api_datatable_collager(){
+        $collagerData = Collager::get();
+        $data = [];
+        foreach ($collagerData as $list) {
+            $data[] = [
+                'id' => Crypt::encryptString($list->id),
+                'npm' => $list->npm,
+                'nama' => $list->nama,
+                'email' => $list->email
+            ];
+        }
+        // Mengembalikan data pengguna dalam format JSON
+        return response()->json([
+            'success' => true,
+            'message' => 'Data mahasiswa berhasil diambil.',
             'data' => $data,
         ], 200);
     }
