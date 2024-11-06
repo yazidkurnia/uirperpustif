@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('npm')->unique()->nullable();
             $table->string('nama')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
         });
     }
