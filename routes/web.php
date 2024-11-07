@@ -49,6 +49,7 @@ Route::get('/approval', function () {
 ############################################# all about setting account ########################################3
 Route::put('/update-user-role', [UsersController::class, 'user_update_role'])->name('user.update.role');
 Route::post('/set-account', [UsersController::class, 'set_account'])->name('setting.user.account');
+Route::delete('/user/delete', [UsersController::class, 'delete_user'])->name('user.delete.account');
 
 ############################################# api datatable #####################################################
 

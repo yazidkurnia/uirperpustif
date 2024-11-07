@@ -47,7 +47,8 @@ class ApiDataTableController extends Controller
                 'id' => Crypt::encryptString($list->id),
                 'npm' => $list->npm,
                 'nama' => $list->nama,
-                'email' => $list->email
+                'email' => $list->email,
+                'role_name' => 'mahasiswa'
             ];
         }
         // Mengembalikan data pengguna dalam format JSON

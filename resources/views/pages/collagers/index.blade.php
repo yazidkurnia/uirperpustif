@@ -66,6 +66,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         var idTable = {!! json_encode($id_table) !!}
 
@@ -106,6 +107,58 @@
             })
         }
 
+        function delete_account(idFromLevel, role) {
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');
+            console.log(role);
+            $.ajax({
+                url: '{{ route('user.delete.account') }}', // Ganti dengan URL yang sesuai
+                type: 'DELETE',
+                data: {
+                    id: idFromLevel,
+                    role: role,
+                    _token: csrfToken
+                },
+                success: function(response) {
+                    Swal.fire(
+                        'Dihapus!',
+                        'Data telah berhasil dihapus.',
+                        'success'
+                    );
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire(
+                        'Gagal!',
+                        'Terjadi kesalahan saat menghapus data.',
+                        'error'
+                    );
+                }
+            });
+        }
+
+        function confirm_to_delete(idFromLevel, role) {
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda tidak dapat mengembalikan data ini setelah dihapus!",
+                icon: 'warning',
+                showCloseButton: true,
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonText: `
+            <i class="fa fa-thumbs-up"></i> Yess!
+        `,
+                confirmButtonAriaLabel: "Thumbs up, great!",
+                cancelButtonText: `
+            <i class="fa fa-thumbs-down"></i> Nah!
+        `,
+                cancelButtonAriaLabel: "Thumbs down"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Panggil fungsi untuk menghapus data
+                    delete_account(idFromLevel, role); // Ganti dengan fungsi yang sesuai
+                }
+            });
+        }
+
         function getData() {
             $.ajax({
                 url: '{{ route('collagers.datatable') }}',
@@ -117,10 +170,26 @@
                     $.each(collager, function(index, collager) {
                         var iteration = index + 1; // Use index for row number
                         var row = '<tr>';
+                        // row +=
+                        //     '<td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="set_value_toform(\'' +
+                        //     collager.id + '\', \'' + collager.npm + '\', \'' + collager.nama +
+                        //     '\', \'' + collager.email + '\')">Ubah Role</button></td>';
                         row +=
-                            '<td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="set_value_toform(\'' +
+                            '<td><div class="btn-group">' +
+                            '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' +
+                            '<ul class="dropdown-menu dropdown-menu-start" style="">' +
+                            '<li>' +
+                            '<button type="button" class="btn btn-white" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="set_value_toform(\'' +
                             collager.id + '\', \'' + collager.npm + '\', \'' + collager.nama +
-                            '\', \'' + collager.email + '\')">Ubah Role</button></td>';
+                            '\', \'' + collager.email + '\')">Aktifasi Akun</button>' + '</li>' +
+                            '<li>' +
+                            '<button type="button" class="btn btn-white" onclick="confirm_to_delete(\'' +
+                            collager.id + '\', \'' + collager.role_name +
+                            '\')">Disaktif Akun</button>' + '</li>' +
+                            // Hapus parameter 'mahasiswa'
+                            '</ul>' +
+                            '</div>' +
+                            '</td>';
                         row += '<td>' + iteration + '</td>';
                         row += '<td>' + collager.npm + '</td>';
                         row += '<td>' + collager.nama + '</td>';

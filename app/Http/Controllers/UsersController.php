@@ -59,6 +59,16 @@ class UsersController extends Controller
                 'data' => [],
             ], 500);
         }
+
+        // periksa apakah user dengan level mahasiswa dari id tersebut sudah memiliki akun
+        $checkAccountById = User::where(['collagerid' => $validCollagerId, 'deleted_at' => NULL])->first();
+        if (!empty($checkAccountById)) {
+            return response()->json([
+                'success' => FALSE,
+                'message' => 'Maaf data yang dipilih telah memiliki akun!',
+                'data' => [],
+            ], 500);
+        }
     
         // Start a transaction
         DB::beginTransaction();
@@ -90,5 +100,48 @@ class UsersController extends Controller
                 'data' => [],
             ], 500);
         }
+    }
+
+    public function delete_user(Request $request)
+    {
+        $validIdFromRoleLevel = $request->id == '' ? NULL : (is_int((int)Crypt::decryptString($request->id)) ? (int)Crypt::decryptString($request->id) : NULL);
+        
+        // Validasi ID pengguna
+        if ($validIdFromRoleLevel == NULL) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak valid.',
+                'data' => [],
+            ], 400);
+        }
+
+        $user = [];
+        if ($request->role == 'mahasiswa') {
+            # code...
+            // Cari pengguna berdasarkan ID
+            $user = User::where(['collagerid' => $validIdFromRoleLevel, 'deleted_at' => NULL])->first();
+        }
+        
+        if ($request->role == 'dosen'){
+            $user = User::where(['lectureid' => $validIdFromRoleLevel, 'deleted_at' => NULL])->first();
+        }
+        
+        // Jika pengguna tidak ditemukan
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pengguna tidak ditemukan.',
+                'data' => [],
+            ], 404);
+        }
+
+        // Lakukan soft delete
+        $user->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengguna berhasil dihapus.',
+            'data' => [],
+        ], 200);
     }
 }
