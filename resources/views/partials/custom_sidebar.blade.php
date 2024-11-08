@@ -11,7 +11,7 @@
     <ul class="menu-inner py-1">
         <!-- Dashboards -->
         <li class="menu-item">
-            <a href="/" class="menu-link">
+            <a href="{{ route('transaction.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-smile"></i>
                 <div class="text-truncate" data-i18n="Dashboards">Dashboards</div>
             </a>
@@ -25,7 +25,7 @@
         @endif
         <!-- Unit -->
         <li class="menu-item">
-            <a href="{{ route('list.collager') }}" class="menu-link">
+            <a href="#" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store"></i>
                 <div class="text-truncate" data-i18n="Front Pages">Peminjaman </div>
             </a>
