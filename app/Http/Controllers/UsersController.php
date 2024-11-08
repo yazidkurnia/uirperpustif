@@ -50,9 +50,9 @@ class UsersController extends Controller
     }
 
     public function set_account(Request $request) {
-        $validCollagerId = $request->id != '' ? is_int((int)Crypt::decryptString($request->id)) == TRUE ? (int)Crypt::decryptString($request->id) != 0 ? (int)Crypt::decryptString($request->id) : NULL : NULL : NULL;
+        $validRoleLevelId = $request->id != '' ? is_int((int)Crypt::decryptString($request->id)) == TRUE ? (int)Crypt::decryptString($request->id) != 0 ? (int)Crypt::decryptString($request->id) : NULL : NULL : NULL;
         
-        if ($validCollagerId == NULL) {
+        if ($validRoleLevelId == NULL) {
             return response()->json([
                 'success' => FALSE,
                 'message' => 'Terjadi kesalahan yang disebabkan oleh data mahasiswa.',
@@ -79,7 +79,7 @@ class UsersController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make('password'),
                 'roleid' => 3,
-                'collagerid' => $validCollagerId,
+                'collagerid' => $validRoleLevelId,
             ]);
     
             // Commit the transaction

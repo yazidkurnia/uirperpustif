@@ -90,7 +90,8 @@
                     nama: $('#nama').val(),
                     npm: $('#npm').val(),
                     email: $('#email_field').val(),
-                    _token: csrfToken
+                    _token: csrfToken,
+                    role: 'Mahasiswa'
                 },
                 success: function(data) {
                     console.log(data);
@@ -103,6 +104,12 @@
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     console.log(errorThrown);
+                    $('#basicModal').modal('hide');
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oups...",
+                        text: "Maaf terjadi kesalahan pada saat menyimpan data, periksa kembali data yang anda inputkan!"
+                    });
                 }
             })
         }
