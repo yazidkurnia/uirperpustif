@@ -17,12 +17,12 @@
             </a>
         </li>
         {{-- Kegiatan --}}
-        <li class="menu-item">
-            <a href="#" class="menu-link">
-                <i class="fa-solid fa-gear"></i>
-                <div class="text-truncate" data-i18n="Front Pages"> Kegiatan </div>
-            </a>
-        </li>
+        <li class="menu-header small text-uppercase"><span class="menu-header-text"> Kegiatan </span></li>
+        @if ($title == 'Setting Account')
+            <li class="menu-item active">
+            @else
+            <li class="menu-item">
+        @endif
         <!-- Unit -->
         <li class="menu-item">
             <a href="{{ route('list.collager') }}" class="menu-link">
@@ -37,6 +37,20 @@
             </a>
         </li>
 
+        <li class="menu-header small text-uppercase"><span class="menu-header-text"> Laporan </span></li>
+        @if ($title == 'Setting Account')
+            <li class="menu-item active">
+            @else
+            <li class="menu-item">
+        @endif
+        <li class="menu-item">
+            <a href="#" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-store"></i>
+                <div class="text-truncate" data-i18n="Front Pages">Laporan Peminjaman </div>
+            </a>
+        </li>
+        <!-- Unit -->
+
         {{-- khusus hak akses admin --}}
         <!-- Setting -->
         <li class="menu-header small text-uppercase"><span class="menu-header-text"> Setting </span></li>
@@ -46,31 +60,12 @@
             <li class="menu-item">
         @endif
 
-        <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <a href="#" class="menu-link menu-toggle">
             <i class="menu-icon tf-icons bx bx-layout"></i>
             <div class="text-truncate" data-i18n="Layouts"> Setting </div>
         </a>
         <ul class="menu-sub">
-            <li class="menu-item">
-                <a href="/hak" class="menu-link">
-                    <div class="text-truncate" data-i18n="Without menu"> Hak Akses </div>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="/approval" class="menu-link">
-                    <div class="text-truncate" data-i18n="Without navbar"> Approval </div>
-                </a>
-            </li>
 
-            @if ($title == 'Setting Account')
-                <li class="menu-item active">
-                @else
-                <li class="menu-item">
-            @endif
-            <a href="{{ url('/users') }}" class="menu-link">
-                <div class="text-truncate" data-i18n="Without navbar"> Users Account </div>
-            </a>
-            </li>
             <li class="menu-item">
                 <a href="/approval" class="menu-link">
                     <div class="text-truncate" data-i18n="Without navbar"> Akun dosen </div>
