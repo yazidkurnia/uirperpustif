@@ -94,10 +94,18 @@
                     tanggal_kembali: tanggalKembali
                 },
                 success: function(data) {
-
+                    Swal.fire({
+                        icon: "success",
+                        title: "Yeay...",
+                        text: "Berhasil menambahkan data!"
+                    });
                 },
                 error: function(data) {
-
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oups...",
+                        text: "Maaf terjadi kesalahan pada saat menyimpan data, periksa kembali data yang anda inputkan!"
+                    });
                 }
             })
         }

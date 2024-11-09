@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers\Transaction;
 
+use DateTime;
 use App\Models\Book\Book;
+use Endroid\QrCode\QrCode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Crypt;
+use App\Models\Transaction\Transaction;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use App\Models\TransactionDetail\TransactionDetail;
 
 class TransactionController extends Controller
 {
@@ -52,8 +59,8 @@ class TransactionController extends Controller
     }
 
     public function store_data_peminjaman(Request $request){
-        $bookId = $request->book_id != '' ? is_int((int)Crypt::decryptString($request->book_id)) ? (int)Crypt::decryptString($request->book_id) ? (int)Crypt::decryptString($request->book_id) != 0 ? (int)Crypt::decryptString($request->book_id) : NULL : NULL : NULL;
-        $tglPeminjaman = $request->tanggal_pinjam;
+        $bookId          = $request->book_id != '' ? is_int((int)Crypt::decryptString($request->book_id)) ? (int)Crypt::decryptString($request->book_id) != 0 ? (int)Crypt::decryptString($request->book_id) : NULL : NULL : NULL;
+        $tglPeminjaman   = $request->tanggal_pinjam;
 
         // Membuat objek DateTime dari tanggal yang diberikan
         $tglPengembalian = new DateTime($tglPeminjaman);
@@ -65,22 +72,23 @@ class TransactionController extends Controller
             return response()->json([
                 'success' => FALSE,
                 'message' => 'Terjadi kesalahan, pada data buku!.',
-                'data' => [],
+                'data'    => [],
             ], 500);
         }
-
+        
         DB::beginTransaction();
     
         try {
-            Transaction::create([
-                'userid' => 1,
-                'jenis_transaksi' => 'Peminjaman',
-                'tgl_pinjam' => $request->tanggal_pinjam,
+            $transaction = Transaction::create([
+                'userid'            => 1,
+                'jenis_transaksi'   => 'Peminjaman',
+                'tgl_pinjam'        => $request->tanggal_pinjam,
                 'tgl_wajib_kembali' => $tglPengembalian
             ]);
     
             TransactionDetail::create([
-                
+                'transaction_id' => $transaction->id,
+                'book_id'        => $bookId
             ]);
 
             // Commit the transaction
@@ -89,7 +97,7 @@ class TransactionController extends Controller
             return response()->json([
                 'success' => TRUE,
                 'message' => 'Berhasil menambahkan akun.',
-                'data' => [],
+                'data'    => [],
             ], 200);
         } catch (\Exception $e) {
             // Rollback the transaction if something goes wrong
@@ -98,7 +106,7 @@ class TransactionController extends Controller
             return response()->json([
                 'success' => FALSE,
                 'message' => 'Terjadi kesalahan saat menambahkan akun: ' . $e->getMessage(),
-                'data' => [],
+                'data'    => [],
             ], 500);
         }
     }
