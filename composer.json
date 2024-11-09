@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "endroid/qr-code": "^6.0",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9"
     },
@@ -54,7 +55,12 @@
         "laravel": {
             "dont-discover": []
         }
-    },
+    },"repositories": [
+    {
+        "type": "composer",
+        "url": "https://packagist.org"
+    }
+],
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
