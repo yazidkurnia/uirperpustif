@@ -83,7 +83,8 @@ class TransactionController extends Controller
                 'userid'            => 1,
                 'jenis_transaksi'   => 'Peminjaman',
                 'tgl_pinjam'        => $request->tanggal_pinjam,
-                'tgl_wajib_kembali' => $tglPengembalian
+                'tgl_wajib_kembali' => $tglPengembalian,
+                'status_approval'   => 'Waiting'
             ]);
     
             TransactionDetail::create([
