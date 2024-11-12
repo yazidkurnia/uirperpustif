@@ -49,7 +49,19 @@
                 <div class="text-truncate" data-i18n="Front Pages">Laporan Peminjaman </div>
             </a>
         </li>
-        <!-- Unit -->
+
+        <li class="menu-header small text-uppercase"><span class="menu-header-text"> Confirm Request </span></li>
+        @if ($title == 'Setting Account')
+            <li class="menu-item active">
+            @else
+            <li class="menu-item">
+        @endif
+        <li class="menu-item">
+            <a href="{{ route('transaction.approval.request') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-store"></i>
+                <div class="text-truncate" data-i18n="Front Pages">Approval Peminjaman </div>
+            </a>
+        </li>
 
         {{-- khusus hak akses admin --}}
         <!-- Setting -->
