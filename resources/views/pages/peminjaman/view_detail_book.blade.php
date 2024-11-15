@@ -52,15 +52,21 @@
                     <form action="" method="post">
                         <input type="hidden" name="book_id" value="{{ $id_buku }}">
                         <div class="row">
-                            <div class="col-md-6 mt-3">
+                            <div class="col-md-12 mt-3">
                                 <label for="">Tanggal peminjaman</label>
                                 <input class="form-control" type="date" name="tgl_peminjaman" placeholder="Default input"
                                     aria-label="default input example">
                             </div>
-                            <div class="col-md-6 mt-3">
-                                <label for="">Tanggal pengembalian</label>
-                                <input class="form-control" type="date" name="tgl_pengembalian"
-                                    placeholder="Default input" aria-label="default input example">
+                            <div class="col-md-12 mt-3">
+                                <label for="">Tambah buku lainya</label>
+                                <select class="form-control choices-multiple" multiple>
+                                    <option value="" disabled selected>Select states...</option>
+                                    @forelse($books as $list)
+                                        <option value="{{ $list['id'] }}">{{ $list['judul'] }}</option>
+                                    @empty
+                                        <span>Empty</span>
+                                    @endforelse
+                                </select>
                             </div>
                         </div>
                     </form>
@@ -78,11 +84,13 @@
             var tanggalPinjam = $('input[name="tgl_peminjaman"]').val();
             var tanggalKembali = $('input[name="tgl_pengembalian"]').val();
             var bookId = $('input[name="book_id"]').val();
+            var bookIds = $('.choices-multiple').val();
             // Mengambil token CSRF dari meta tag
             var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
-            console.log(tanggalPinjam);
             console.log(tanggalKembali);
+            console.log(tanggalPinjam);
+            console.log(bookIds);
 
             $.ajax({
                 url: '{{ route('transaction.store') }}',
@@ -91,7 +99,8 @@
                     _token: csrfToken,
                     book_id: bookId,
                     tanggal_pinjam: tanggalPinjam,
-                    tanggal_kembali: tanggalKembali
+                    tanggal_kembali: tanggalKembali,
+                    addional_books: bookIds
                 },
                 success: function(data) {
                     Swal.fire({
@@ -109,5 +118,13 @@
                 }
             })
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            const choices = new Choices('.choices-multiple', {
+                removeItemButton: true, // Allow removing selected items
+                searchEnabled: true, // Enable search functionality
+                placeholder: true, // Show placeholder
+                placeholderValue: 'Select states...',
+            });
+        });
     </script>
 @endsection

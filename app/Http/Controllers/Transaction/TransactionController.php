@@ -46,21 +46,70 @@ class TransactionController extends Controller
      */
     public function pengajuan_peminjaman($bookId){
         $validBookId = $bookId != '' ? is_int((int)Crypt::decryptString($bookId)) ? (int)Crypt::decryptString($bookId) != 0 ? (int)Crypt::decryptString($bookId) : NULL  : NULL : NULL;
-
+    
         if ($validBookId == NULL) {
             return redirect()->back()->withErrors('Data buku tidak valid')->withInput();
         }
-
+    
         $dataBuku = Book::find($validBookId);
         $data['id_buku'] = $bookId;
         $data['detail_buku'] = $dataBuku;
         $data['title'] = 'Proses Peminjaman';
+    
+        // Encrypt the IDs and create a new array
+        $dataOpsiBuku = Book::get()->map(function($list) {
+            return [
+                'id' => Crypt::encryptString($list->id),
+                'judul' => $list->judul,
+                'no_revisi' => $list->no_revisi,
+                'penulis' => $list->penulis,
+                'tahun_terbit' => $list->tahun_terbit,
+                'penerbit' => $list->penerbit,
+                'created_at' => $list->created_at,
+                'updated_at' => $list->updated_at,
+                'image_url' => $list->image_url,
+            ];
+        });
+    
+        $data['books'] = $dataOpsiBuku;
+    
         return view('pages.peminjaman.view_detail_book', $data);
     }
 
     public function store_data_peminjaman(Request $request){
         $bookId          = $request->book_id != '' ? is_int((int)Crypt::decryptString($request->book_id)) ? (int)Crypt::decryptString($request->book_id) != 0 ? (int)Crypt::decryptString($request->book_id) : NULL : NULL : NULL;
         $tglPeminjaman   = $request->tanggal_pinjam;
+        $additionalBooks  = $request->addional_books;
+        // Initialize an array to hold the decrypted values
+        $decryptedBooks = [];
+
+        foreach ($additionalBooks as $book) {
+            try {
+                // Decrypt the book ID
+                $decryptedBookId = Crypt::decryptString($book);
+                $decryptedBooks[] = $decryptedBookId; // Store the decrypted ID
+            } catch (DecryptException $e) {
+                // Handle the exception if decryption fails
+                return redirect()->back()->withErrors('Failed to decrypt book ID: ' . $e->getMessage());
+            }
+        }
+
+        if (in_array($bookId, $decryptedBooks)) {
+            $duplikatBook = Book::find($bookId);
+            return response()->json([
+                'success' => FALSE,
+                'message' => 'Terjadi kesalahan, buku dengan judul ' . $duplikatBook->judul . ' telah dipilih lebih dari satu kali, ketentuan hanya boleh meminjam 1 buku perjudul!.',
+                'data'    => [],
+            ], 400);
+        }
+        
+        if(!$request->tanggal_pinjam){
+            return response()->json([
+                'success' => FALSE,
+                'message' => 'Terjadi kesalahan, Tanggal peminjaman tidak boleh kosong!.',
+                'data'    => [],
+            ], 400);
+        }
 
         // Membuat objek DateTime dari tanggal yang diberikan
         $tglPengembalian = new DateTime($tglPeminjaman);
@@ -79,6 +128,7 @@ class TransactionController extends Controller
         DB::beginTransaction();
     
         try {
+
             $transaction = Transaction::create([
                 'userid'            => 1,
                 'jenis_transaksi'   => 'Peminjaman',
@@ -86,7 +136,16 @@ class TransactionController extends Controller
                 'tgl_wajib_kembali' => $tglPengembalian,
                 'status_approval'   => 'Waiting'
             ]);
+
+            // additional book
+            for($i = 0; $i < count($decryptedBooks); $i++){
+                TransactionDetail::create([
+                    'transaction_id' => $transaction->id,
+                    'book_id'        => $decryptedBooks[$i]
+                ]);
+            }
     
+            // choosed book
             TransactionDetail::create([
                 'transaction_id' => $transaction->id,
                 'book_id'        => $bookId
@@ -110,5 +169,35 @@ class TransactionController extends Controller
                 'data'    => [],
             ], 500);
         }
+    }
+
+    /**
+     * @param integer id [transaksi id]
+     */
+    public function detail_peminjaman($id){
+        $validTransactionId = $id != '' ? is_int((int)Crypt::decryptString($id)) ? (int)Crypt::decryptString($id) != 0 ? (int)Crypt::decryptString($id) : NULL : NULL : NULL;
+        $data['title'] = 'Detail Peminjaman Buku';
+        
+        // cek apakah id dai data yang dipilih tidak null
+        if ($validTransactionId == NULL) {
+            return redirect()->back()->withErrors(array('error', 'Data yang dipilih tidak ditemukan'));
+        }
+
+        // ambil data setiap buku yang dipinjam yang berasal dari transaksi peminjaman
+        $detailTransaksiItem = TransactionDetail::join('transactions', 'transactions.id', '=', 'transaction_details.transaction_id')
+        ->join('books', 'books.id', '=', 'transaction_details.book_id')
+        ->where('transaction_id', $validTransactionId)->get();
+
+        $dataTransaksi = Transaction::select('transactions.id', 'users.name', 'users.email', 'transactions.jenis_transaksi', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali')
+        ->where('transactions.id', $validTransactionId)
+        ->join('users', 'users.id', '=', 'transactions.userid')
+        ->first();
+
+        $data['transaksi'] = $dataTransaksi;
+        $data['transaksi_detail'] = $detailTransaksiItem;
+        $data['transaction_id'] = $id;
+
+        // dd($detailTransaksiItem);
+        return view('pages.approval_peminjaman.view', $data);
     }
 }

@@ -57,7 +57,7 @@
             <li class="menu-item">
         @endif
         <li class="menu-item">
-            <a href="{{ route('transaction.approval.request') }}" class="menu-link">
+            <a href="{{ route('transaction.approval') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store"></i>
                 <div class="text-truncate" data-i18n="Front Pages">Approval Peminjaman </div>
             </a>
