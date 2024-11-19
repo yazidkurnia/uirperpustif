@@ -200,4 +200,58 @@ class TransactionController extends Controller
         // dd($detailTransaksiItem);
         return view('pages.approval_peminjaman.view', $data);
     }
+
+    public function cancel_peminjaman(Request $request)
+    {
+        // Decrypt and validate transaction ID
+        $validTransactionId = $request->id != '' ? is_int((int)Crypt::decryptString($request->id)) ? (int)Crypt::decryptString($request->id) != 0 ? (int)Crypt::decryptString($request->id) : NULL  : NULL : NULL;
+    
+        // Start the database transaction
+        DB::beginTransaction();
+    
+        try {
+            // Find the transaction
+            $transaction = Transaction::find($validTransactionId);
+    
+            // If transaction not found, rollback and return error
+            if (!$transaction) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => FALSE,
+                    'message' => 'Maaf, transaksi tidak ditemukan.',
+                    'data'    => [],
+                ], 404);
+            }
+    
+            // Get transaction details
+            $transactionDetail = TransactionDetail::where('transaction_id', $validTransactionId)->get();
+    
+            // Delete the transaction details
+            foreach ($transactionDetail as $detail) {
+                $detail->delete();
+            }
+    
+            // Delete the transaction
+            $transaction->delete();
+    
+            // Commit the transaction
+            DB::commit();
+    
+            // Return a successful response
+            return response()->json([
+                'success' => TRUE,
+                'message' => 'Data berhasil dihapus.',
+                'data'    => [],
+            ], 200);
+    
+        } catch (\Exception $e) {
+            // If anything fails, rollback the transaction
+            DB::rollBack();
+            return response()->json([
+                'success' => FALSE,
+                'message' => 'Terjadi kesalahan, silahkan hubungi administrator.',
+                'data'    => [],
+            ], 500);
+        }
+    }
 }

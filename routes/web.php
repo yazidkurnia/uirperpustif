@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EmployeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Loan\LoanController;
 use App\Http\Middleware\Rolechekmiddleware\CheckUserRole;
 use App\Http\Controllers\Transaction\TransactionController;
 use App\Http\Controllers\ApiDataTable\ApiDataTableController;
@@ -41,8 +42,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/collager', [CollagerController::class, 'index'])->name('list.collager');
-    Route::get('/fetch-data-collager', [ApiDataTableController::class, 'api_datatable_collager'])->name('collagers.datatable');
-    Route::get('/list-waiting-transaction', [ApiDataTableController::class,'api_datatable_approve_peminjaman'])->name('transaksi_peminjaman.datatable');
     ############################################ all about setting account ########################################
     Route::put('/update-user-role', [UsersController::class, 'user_update_role'])->name('user.update.role');
     Route::post('/set-account', [UsersController::class, 'set_account'])->name('setting.user.account');
@@ -56,16 +55,21 @@ Route::middleware('auth')->group(function () {
     Route::get('/pengajuan-peminjaman/{id}', [TransactionController::class, 'pengajuan_peminjaman'])->name('transaction.proses_peminjaman');
     Route::get('/detail-peminjaman/{id}', [TransactionController::class, 'detail_peminjaman'])->name('transaction.peminjaman.detail');
     Route::post('/proses-pengajuan', [TransactionController::class, 'store_data_peminjaman'])->name('transaction.store');
-
+    Route::delete('/cancel/peminjaman', [TransactionController::class, 'cancel_peminjaman'])->name('transaction.cancel_peminjaman');
     ############################################# confirm request ###################################################
     Route::get('/list-peminjaman-pengembalian', [ApprovalTransactionController::class, 'index'])->name('transaction.approval');
     Route::get('/request-process', [TransactionController::class, 'approval_request'])->name('transaction.approval.request');
 
     ############################################# api datatable ####################################################
     Route::get('/fetch-data-users', [ApiDataTableController::class, 'api_datatable_users'])->name('users.datatable');
-
+    Route::get('/fetch-data-collager', [ApiDataTableController::class, 'api_datatable_collager'])->name('collagers.datatable');
+    Route::get('/list-waiting-transaction', [ApiDataTableController::class,'api_datatable_approve_peminjaman'])->name('transaksi_peminjaman.datatable');
+    Route::get('/data/buku/peminjaman-user', [ApiDataTableController::class,'api_datatable_users_book'])->name('users.loaning.books');
     ############################################# all about approval ###############################################
     Route::post('/approval-peminjaman', [ApprovalTransactionController::class, 'approve_transaksi_peminjaman'])->name('transaction.approval.peminjaman');
+
+    ############################################# all about data peminjaman ########################################
+    Route::get('/user/peminjaman',[ LoanController::class, 'index'])->name('data.loaning');
 
 });
 

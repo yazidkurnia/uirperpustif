@@ -25,7 +25,7 @@
         @endif
         <!-- Unit -->
         <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href="{{ route('data.loaning') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store"></i>
                 <div class="text-truncate" data-i18n="Front Pages">Peminjaman </div>
             </a>

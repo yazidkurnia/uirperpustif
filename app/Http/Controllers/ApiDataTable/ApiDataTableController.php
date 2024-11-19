@@ -68,7 +68,6 @@ class ApiDataTableController extends Controller
         ->get();
         
         $data = [];
-        $data = []; // Pastikan untuk menginisialisasi $data sebagai array
 
         foreach ($approvalPeminjaman as $list) {
             // Tentukan status approval berdasarkan kondisi
@@ -92,6 +91,71 @@ class ApiDataTableController extends Controller
 
          // Mengembalikan data pengguna dalam format JSON
          return response()->json([
+            'success' => true,
+            'message' => 'Data mahasiswa berhasil diambil.',
+            'data' => $data,
+        ], 200);
+    }
+
+    public function api_datatable_users_book(){
+        $dataBukuPinjam = [];
+
+        if (Auth::user()->roleid == 3) {
+            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'collagers.npm as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval')->join('users', 'users.id', '=', 'transactions.userid')
+            ->join('collagers', 'collagers.id', '=', 'users.collagerid')
+            ->where('userid', Auth::user()->id)
+            ->get();
+        }
+
+        if (Auth::user()->roleid == 2) {
+            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'lectures.nidn as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval')->join('users', 'users.id', '=', 'transactions.userid')
+            ->join('lectures', 'lectures.id', '=', 'users.lectureid')
+            ->where('userid', Auth::user()->id)
+            ->get();
+        }
+
+        $data = [];
+
+        foreach ($dataBukuPinjam as $list) {
+
+            $dateTglPinjam = date_create($list->tgl_pinjam);
+            $tglKembali    = date_create($list->tgl_wajib_kembali);
+            $statusApproval = '';
+
+            if ($list->status_approval == 'Waiting'){
+                $statusApproval = '<span class="badge bg-label-warning">'.$list->status_approval.'</span>';
+            }
+
+            if ($list->status_approval == 'Reject'){
+                $statusApproval = '<span class="badge bg-label-danger">'.$list->status_approval.'</span>';
+            }
+
+            if ($list->status_approval == 'Approved'){
+                $statusApproval = '<span class="badge bg-label-primary">'.$list->status_approval.'</span>';
+            }
+
+            $tenggatPengembalian = date_diff($dateTglPinjam, $tglKembali);
+            $data[] = [
+                'action' => '<td><div class="btn-group">' .
+                            '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                            '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                            '<li>' .
+                            '<button type="button" class="btn btn-white" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="cancel_peminjaman(\'' .
+                            Crypt::encryptString($list->id) .'\')">Cancel</button>' . '</li>' .
+                            // Hapus parameter 'mahasiswa'
+                            '</ul>' .
+                            '</div>' .
+                            '</td>',
+                'npm' => $list->unique_code,
+                'nama'=> $list->nama,
+                'tgl_pinjam' => $list->tgl_pinjam,
+                'tgl_wajib_kembali' => $list->tgl_wajib_kembali,
+                'tenggat' => $tenggatPengembalian->format("%R%a days"),
+                'status_approval' => $statusApproval
+            ];
+        }
+
+        return response()->json([
             'success' => true,
             'message' => 'Data mahasiswa berhasil diambil.',
             'data' => $data,
