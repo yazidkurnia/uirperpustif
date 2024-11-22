@@ -5,6 +5,7 @@ namespace App\Http\Controllers\ApiDataTable;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Collager\Collager;
+use App\Models\BookStock\BookStock;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -35,7 +36,7 @@ class ApiDataTableController extends Controller
     
         // Mengembalikan data pengguna dalam format JSON
         return response()->json([
-            'success' => true,
+            'success' => TRUE,
             'message' => 'Data pengguna berhasil diambil.',
             'data' => $data,
         ], 200);
@@ -55,7 +56,7 @@ class ApiDataTableController extends Controller
         }
         // Mengembalikan data pengguna dalam format JSON
         return response()->json([
-            'success' => true,
+            'success' => TRUE,
             'message' => 'Data mahasiswa berhasil diambil.',
             'data' => $data,
         ], 200);
@@ -91,7 +92,7 @@ class ApiDataTableController extends Controller
 
          // Mengembalikan data pengguna dalam format JSON
          return response()->json([
-            'success' => true,
+            'success' => TRUE,
             'message' => 'Data mahasiswa berhasil diambil.',
             'data' => $data,
         ], 200);
@@ -101,7 +102,8 @@ class ApiDataTableController extends Controller
         $dataBukuPinjam = [];
 
         if (Auth::user()->roleid == 3) {
-            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'collagers.npm as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval')->join('users', 'users.id', '=', 'transactions.userid')
+            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'collagers.npm as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval')
+            ->join('users', 'users.id', '=', 'transactions.userid')
             ->join('collagers', 'collagers.id', '=', 'users.collagerid')
             ->where('userid', Auth::user()->id)
             ->get();
@@ -156,7 +158,26 @@ class ApiDataTableController extends Controller
         }
 
         return response()->json([
-            'success' => true,
+            'success' => TRUE,
+            'message' => 'Data mahasiswa berhasil diambil.',
+            'data' => $data,
+        ], 200);
+    }
+
+    public function api_datatable_book_stock(){
+        $dataBookStock = BookStock::get();
+
+        $data = [];
+        foreach ($dataBookStock as $list) {
+            $data[]=[
+                'id' => Crypt::encryptString($list->id),
+                'kategori' => $list->nama_kategori,
+                'sisa_stok' => $list->total
+            ];
+        }    
+        
+        return response()->json([
+            'success' => TRUE,
             'message' => 'Data mahasiswa berhasil diambil.',
             'data' => $data,
         ], 200);

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\Transaction\Transaction;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -130,7 +131,7 @@ class TransactionController extends Controller
         try {
 
             $transaction = Transaction::create([
-                'userid'            => 1,
+                'userid'            => Auth::user()->id,
                 'jenis_transaksi'   => 'Peminjaman',
                 'tgl_pinjam'        => $request->tanggal_pinjam,
                 'tgl_wajib_kembali' => $tglPengembalian,

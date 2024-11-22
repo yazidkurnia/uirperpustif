@@ -146,9 +146,19 @@
                 },
                 success: function(data) {
                     console.log(data);
+                    Swal.fire({
+                        icon: "success",
+                        title: "Yeay...",
+                        text: "Berhasil menambahkan data!"
+                    });
                 },
                 error: function(xhr, textStatus, error) {
                     console.log(error);
+                    Swal.fire({
+                        icon: "Error",
+                        title: "Yeay...",
+                        text: "Berhasil menambahkan data!"
+                    });
                 }
             });
         }

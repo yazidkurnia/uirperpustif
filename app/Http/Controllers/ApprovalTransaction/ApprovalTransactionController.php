@@ -69,6 +69,15 @@ class ApprovalTransactionController extends Controller
     
         // Mengambil data dari tabel book_stocks berdasarkan sekumpulan book_id
         $bookStocks = BookStock::whereIn('book_id', $bookIds)->get();
+
+        // cek apakah data transaksi telah di approve sebelumnya
+        if($getDataTransaksi->status_approval == 'Approved'){
+            return response()->json([
+                'success' => FALSE,
+                'message' => 'Gagal, data transaksi yang dipilih tidak dapat diapprove karena telah diapprove sebelumnya',
+                'data'    => [],
+            ], 500);
+        }
     
         // Mulai transaksi database
         DB::beginTransaction();
