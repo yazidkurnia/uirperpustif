@@ -41,6 +41,7 @@
                 },
                 success: function(data) {
                     console.log('berhasil menghapus data');
+                    getData();
                     Swal.fire({
                         icon: "success",
                         title: "Yeay...",
@@ -49,6 +50,13 @@
                 },
                 error: function(data) {
                     console.log('data gagal dihapus');
+
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oups...",
+                        text: data.message
+                    });
+
                 }
             });
         }
@@ -83,10 +91,24 @@
             });
         }
 
+        // $(document).ready(function() {
+        //     // Custom search functionality
+        //     $('#searchInput').on('keyup', function() {
+        //         // Assuming you are using DataTables, you can implement search here
+        //     });
+
+        //     // Call the function to get data
+        //     getData();
+        // });
+
         $(document).ready(function() {
             // Custom search functionality
             $('#searchInput').on('keyup', function() {
-                // Assuming you are using DataTables, you can implement search here
+                var value = $(this).val().toLowerCase(); // Ambil nilai input dan ubah menjadi huruf kecil
+                $('#dataTable tbody tr').filter(function() {
+                    // Periksa apakah teks dalam baris cocok dengan input pencarian
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
             });
 
             // Call the function to get data
