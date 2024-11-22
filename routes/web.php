@@ -9,8 +9,10 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EmployeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Loan\LoanController;
+use App\Http\Controllers\Stock\StockController;
 use App\Http\Middleware\Rolechekmiddleware\CheckUserRole;
 use App\Http\Controllers\Transaction\TransactionController;
+use App\Http\Controllers\Report\ReportTransactionController;
 use App\Http\Controllers\ApiDataTable\ApiDataTableController;
 use App\Http\Controllers\CollagerController\CollagerController;
 use App\Http\Controllers\ApprovalTransaction\ApprovalTransactionController;
@@ -65,11 +67,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/fetch-data-collager', [ApiDataTableController::class, 'api_datatable_collager'])->name('collagers.datatable');
     Route::get('/list-waiting-transaction', [ApiDataTableController::class,'api_datatable_approve_peminjaman'])->name('transaksi_peminjaman.datatable');
     Route::get('/data/buku/peminjaman-user', [ApiDataTableController::class,'api_datatable_users_book'])->name('users.loaning.books');
+    Route::get('/list/stok', [ApiDataTableController::class, 'api_datatable_book_stock'])->name('api.data.stock');
+
     ############################################# all about approval ###############################################
     Route::post('/approval-peminjaman', [ApprovalTransactionController::class, 'approve_transaksi_peminjaman'])->name('transaction.approval.peminjaman');
 
     ############################################# all about data peminjaman ########################################
     Route::get('/user/peminjaman',[ LoanController::class, 'index'])->name('data.loaning');
+
+    ############################################# all about reporting ##############################################
+    Route::get('/report/pp', [ReportTransactionController::class, 'index'])->name('report.transaction');
+
+    ############################################# all about stock ##################################################
+    Route::get('/all-stock', [StockController::class, 'index'])->name('stock.data');
 
 });
 
@@ -109,6 +119,7 @@ Route::get('/approval', function () {
 Route::get('/unauthorization', function() {
     return view('pages.general.unauthorization');
 })->name('user.unauthorization');
+
 
 
 require __DIR__.'/auth.php';
