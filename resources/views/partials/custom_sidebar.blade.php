@@ -44,9 +44,9 @@
             <li class="menu-item">
         @endif
         <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href="{{ route('report.transaction') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store"></i>
-                <div class="text-truncate" data-i18n="Front Pages">Laporan Peminjaman </div>
+                <div class="text-truncate" data-i18n="Front Pages">Laporan Peminjaman dan Pengembalian </div>
             </a>
         </li>
 
@@ -89,6 +89,19 @@
                 </a>
             </li>
         </ul>
+        </li>
+        <li class="menu-header small text-uppercase"><span class="menu-header-text"> Stok Buku </span></li>
+        @if ($title == 'Data Stok Buku')
+            <li class="menu-item active">
+            @else
+            <li class="menu-item">
+        @endif
+        <!-- Unit -->
+        <li class="menu-item">
+            <a href="{{ route('stock.data') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-store"></i>
+                <div class="text-truncate" data-i18n="Front Pages">Data Stok </div>
+            </a>
         </li>
     </ul>
 </aside>
