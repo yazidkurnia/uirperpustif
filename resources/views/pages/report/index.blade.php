@@ -115,6 +115,7 @@
         const monthlyData = @json($formattedChartData);
         const labels = monthlyData.labels;
         const data = monthlyData.data;
+        const dataPengembalian = monthlyData.data_pengembalian;
 
         // Konfigurasi Chart
         console.log(data);
@@ -134,7 +135,7 @@
                 data: data
             }, {
                 name: 'Pengembalian',
-                data: [1, 2, 3, 4, 2, 2, 2, 2, 2, 1, 1, 1],
+                data: dataPengembalian,
             }],
             xaxis: {
                 categories: labels,

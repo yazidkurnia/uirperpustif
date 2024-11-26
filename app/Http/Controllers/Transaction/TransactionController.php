@@ -6,17 +6,29 @@ use DateTime;
 use App\Models\Book\Book;
 use Endroid\QrCode\QrCode;
 use Illuminate\Http\Request;
+use Endroid\QrCode\Logo\Logo;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Label\Label;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Auth;
+use Endroid\QrCode\Encoding\Encoding;
 use Illuminate\Support\Facades\Crypt;
+use Endroid\QrCode\RoundBlockSizeMode;
 use App\Models\Transaction\Transaction;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use App\Models\TransactionDetail\TransactionDetail;
+use App\Http\Helpers\QrGeneratorHelper;
 
 class TransactionController extends Controller
 {
+    protected QrGeneratorHelper $qrCodeHelper;
+
+    public function __construct(QrGeneratorHelper $qrCodeHelper)
+    {
+        $this->qrCodeHelper = $qrCodeHelper;
+    }
     /**
      * pada fungsi berikut menampilkan halaman peminjaman dari sisi user
      * dapat diakase oleh semua role user
@@ -138,6 +150,12 @@ class TransactionController extends Controller
                 'status_approval'   => 'Waiting'
             ]);
 
+            $encryptedTransactionId = Crypt::encryptString($transaction->id);
+
+            $dataUri = $this->qrCodeHelper->generateQr("http://127.0.0.1:8000/detail-peminjaman/{$encryptedTransactionId}");
+
+            $transaction->qr_url = $dataUri;
+            $transaction->save();
             // additional book
             for($i = 0; $i < count($decryptedBooks); $i++){
                 TransactionDetail::create([
@@ -254,5 +272,39 @@ class TransactionController extends Controller
                 'data'    => [],
             ], 500);
         }
+    }
+
+    /**
+     * Documentaion function
+     *
+     * @param String $id
+     * @param $id [transaction id]
+     * @return void
+     */
+    public function generate_transaction_qr(String $id) {
+        $writer = new PngWriter();
+        // Buat instance dari QrCode
+        $qrCode = new QrCode(
+            data: 'Life is too short to be generating QR codes',
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::Low,
+            size: 300,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+            foregroundColor: new Color(0, 0, 0),
+            backgroundColor: new Color(255, 255, 255),
+            // setContent: 'sdfsdfd'
+        );
+        
+        $result = $writer->write($qrCode);
+
+        // Save it to a file
+        $result->saveToFile('assets/generated_qr/qrcode.png'); //TODO:: ubah lokasi penyimpanan di folder public image
+
+        // Generate a data URI to include image data inline (i.e. inside an <img> tag)
+        $dataUri = $result->getDataUri();
+
+        return $dataUri;
+        // Atur header tipe konten
     }
 }

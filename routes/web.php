@@ -58,6 +58,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/detail-peminjaman/{id}', [TransactionController::class, 'detail_peminjaman'])->name('transaction.peminjaman.detail');
     Route::post('/proses-pengajuan', [TransactionController::class, 'store_data_peminjaman'])->name('transaction.store');
     Route::delete('/cancel/peminjaman', [TransactionController::class, 'cancel_peminjaman'])->name('transaction.cancel_peminjaman');
+    Route::get('/generate-qrcode/{id}', [TransactionController::class, 'generate_transaction_qr'])->name('transaction.generate.qr');
+   
     ############################################# confirm request ###################################################
     Route::get('/list-peminjaman-pengembalian', [ApprovalTransactionController::class, 'index'])->name('transaction.approval');
     Route::get('/request-process', [TransactionController::class, 'approval_request'])->name('transaction.approval.request');
@@ -74,6 +76,7 @@ Route::middleware('auth')->group(function () {
 
     ############################################# all about data peminjaman ########################################
     Route::get('/user/peminjaman',[ LoanController::class, 'index'])->name('data.loaning');
+    
 
     ############################################# all about reporting ##############################################
     Route::get('/report/pp', [ReportTransactionController::class, 'index'])->name('report.transaction');
@@ -82,6 +85,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/all-stock', [StockController::class, 'index'])->name('stock.data');
 
 });
+
+Route::get('image/qrcode/{text}', [
+    LoanController::class,
+    'makeQrCode'
+])->name('qrcode');
 
 Route::get('/fuel', function () {
     return view('fuel');

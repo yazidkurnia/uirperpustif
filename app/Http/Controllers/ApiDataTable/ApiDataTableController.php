@@ -142,8 +142,12 @@ class ApiDataTableController extends Controller
                             '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
                             '<ul class="dropdown-menu dropdown-menu-start" style="">' .
                             '<li>' .
-                            '<button type="button" class="btn btn-white" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="cancel_peminjaman(\'' .
-                            Crypt::encryptString($list->id) .'\')">Cancel</button>' . '</li>' .
+                            '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="cancel_peminjaman(\'' .
+                            Crypt::encryptString($list->id) .'\')">Cancel</button>' . 
+                            '</li>' .
+                            '<li>' .
+                            '<button type="button" class="btn btn-white text-left btn-sm" data-bs-toggle="modal" data-bs-toggle="modal" data-bs-target="#modalToggle">Generate Qr Code</button>' . 
+                            '</li>' .
                             // Hapus parameter 'mahasiswa'
                             '</ul>' .
                             '</div>' .
