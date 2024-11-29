@@ -39,4 +39,21 @@ class LoanController extends Controller
             ->setLabelFontSize(16)
             ->render();
     }
+
+    public function peminjaman_by_userid(){
+        $data['title'] = 'Data Peminjaman Anda';
+        $data['id_table'] = 'tbl_peminjaman';
+        $data['configHeaderTable'] = [
+            'Action',
+            'No',
+            'Npm',
+            'Nama',
+            'Tanggal Pinjam',
+            'Tanggal Pengembalian',
+            'Sisa Waktu Pengembalian',
+            'Status'
+        ];
+
+        return view('pages.user_loaning.index', $data);
+    }
 }

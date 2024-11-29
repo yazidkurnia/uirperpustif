@@ -99,10 +99,11 @@ class ApiDataTableController extends Controller
     }
 
     public function api_datatable_users_book(){
+
         $dataBukuPinjam = [];
 
         if (Auth::user()->roleid == 3) {
-            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'collagers.npm as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval')
+            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'collagers.npm as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval', 'transactions.qr_url')
             ->join('users', 'users.id', '=', 'transactions.userid')
             ->join('collagers', 'collagers.id', '=', 'users.collagerid')
             ->where('userid', Auth::user()->id)
@@ -110,16 +111,15 @@ class ApiDataTableController extends Controller
         }
 
         if (Auth::user()->roleid == 2) {
-            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'lectures.nidn as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval')->join('users', 'users.id', '=', 'transactions.userid')
+            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'lectures.nidn as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval', 'transactions.qr_url')->join('users', 'users.id', '=', 'transactions.userid')
             ->join('lectures', 'lectures.id', '=', 'users.lectureid')
             ->where('userid', Auth::user()->id)
             ->get();
         }
 
         $data = [];
-
         foreach ($dataBukuPinjam as $list) {
-
+            // var_dump($list->qr_url);
             $dateTglPinjam = date_create($list->tgl_pinjam);
             $tglKembali    = date_create($list->tgl_wajib_kembali);
             $statusApproval = '';
@@ -146,7 +146,10 @@ class ApiDataTableController extends Controller
                             Crypt::encryptString($list->id) .'\')">Cancel</button>' . 
                             '</li>' .
                             '<li>' .
-                            '<button type="button" class="btn btn-white text-left btn-sm" data-bs-toggle="modal" data-bs-toggle="modal" data-bs-target="#modalToggle">Generate Qr Code</button>' . 
+                            '<button type="button" class="btn btn-white text-left btn-sm" onclick="show_qr_image(\''. asset($list->qr_url) .'\')">View Qr Code</button>' . 
+                            '</li>' .
+                            '<li>' .
+                            '<button type="button" class="btn btn-white text-left btn-sm">Download Qr Code</button>' . 
                             '</li>' .
                             // Hapus parameter 'mahasiswa'
                             '</ul>' .
