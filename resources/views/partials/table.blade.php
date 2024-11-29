@@ -1,4 +1,4 @@
-<table id="dataTable" class="table table-striped">
+<table id="dataTable" class="table table-striped table-responsive">
     <thead>
         <tr>
             @for ($i = 0; $i < count($configHeaderTable); $i++)
