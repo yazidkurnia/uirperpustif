@@ -39,15 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () { //! tanpa pengeceka
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    Route::get('/collager', [CollagerController::class, 'index'])->name('list.collager');
-    ############################################ all about setting account ########################################
-    Route::put('/update-user-role', [UsersController::class, 'user_update_role'])->name('user.update.role');
-    Route::post('/set-account', [UsersController::class, 'set_account'])->name('setting.user.account');
-    Route::delete('/user/delete', [UsersController::class, 'delete_user'])->name('user.delete.account');
+   
 
     ############################################ all about transaction is here ####################################
     Route::get('/peminjaman-buku', [TransactionController::class, 'index'])->name('transaction.index');
@@ -76,7 +68,7 @@ Route::middleware('auth')->group(function () {
 
     ############################################# all about data peminjaman ########################################
     Route::get('/user/peminjaman',[ LoanController::class, 'index'])->name('data.loaning');
-    
+    Route::get('/user/loaning', [LoanController::class, 'peminjaman_by_userid'])->name('loaning.by.userid');
 
     ############################################# all about reporting ##############################################
     Route::get('/report/pp', [ReportTransactionController::class, 'index'])->name('report.transaction');
@@ -84,6 +76,18 @@ Route::middleware('auth')->group(function () {
     ############################################# all about stock ##################################################
     Route::get('/all-stock', [StockController::class, 'index'])->name('stock.data');
 
+});
+
+Route::middleware(['auth', 'role'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/collager', [CollagerController::class, 'index'])->name('list.collager');
+    ############################################ all about setting account ########################################
+    Route::put('/update-user-role', [UsersController::class, 'user_update_role'])->name('user.update.role');
+    Route::post('/set-account', [UsersController::class, 'set_account'])->name('setting.user.account');
+    Route::delete('/user/delete', [UsersController::class, 'delete_user'])->name('user.delete.account');
 });
 
 Route::get('image/qrcode/{text}', [

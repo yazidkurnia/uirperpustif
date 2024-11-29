@@ -30,78 +30,86 @@
                 <div class="text-truncate" data-i18n="Front Pages">Peminjaman </div>
             </a>
         </li>
+        {{-- <li class="menu-item">
+            <a href="{{ route('loaning.by.userid') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-store"></i>
+                <div class="text-truncate" data-i18n="Front Pages">Peminjaman Anda </div>
+            </a>
+        </li> --}}
         <li class="menu-item">
             <a href="/unit" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-store"></i>
                 <div class="text-truncate" data-i18n="Front Pages">Pengembalian </div>
             </a>
         </li>
-
-        <li class="menu-header small text-uppercase"><span class="menu-header-text"> Laporan </span></li>
-        @if ($title == 'Setting Account')
-            <li class="menu-item active">
-            @else
+        @if (Auth::user()->roleid == 1)
+            <li class="menu-header small text-uppercase"><span class="menu-header-text"> Laporan </span></li>
+            @if ($title == 'Setting Account')
+                <li class="menu-item active">
+                @else
+                <li class="menu-item">
+            @endif
             <li class="menu-item">
-        @endif
-        <li class="menu-item">
-            <a href="{{ route('report.transaction') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-store"></i>
-                <div class="text-truncate" data-i18n="Front Pages">Laporan Peminjaman dan Pengembalian </div>
-            </a>
-        </li>
-
-        <li class="menu-header small text-uppercase"><span class="menu-header-text"> Confirm Request </span></li>
-        @if ($title == 'Setting Account')
-            <li class="menu-item active">
-            @else
-            <li class="menu-item">
-        @endif
-        <li class="menu-item">
-            <a href="{{ route('transaction.approval') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-store"></i>
-                <div class="text-truncate" data-i18n="Front Pages">Approval Peminjaman </div>
-            </a>
-        </li>
-
-        {{-- khusus hak akses admin --}}
-        <!-- Setting -->
-        <li class="menu-header small text-uppercase"><span class="menu-header-text"> Setting </span></li>
-        @if ($title == 'Setting Account')
-            <li class="menu-item active">
-            @else
-            <li class="menu-item">
-        @endif
-
-        <a href="#" class="menu-link menu-toggle">
-            <i class="menu-icon tf-icons bx bx-layout"></i>
-            <div class="text-truncate" data-i18n="Layouts"> Setting </div>
-        </a>
-        <ul class="menu-sub">
-
-            <li class="menu-item">
-                <a href="/approval" class="menu-link">
-                    <div class="text-truncate" data-i18n="Without navbar"> Akun dosen </div>
+                <a href="{{ route('report.transaction') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-store"></i>
+                    <div class="text-truncate" data-i18n="Front Pages">Laporan Peminjaman dan Pengembalian </div>
                 </a>
             </li>
+
+            <li class="menu-header small text-uppercase"><span class="menu-header-text"> Confirm Request </span></li>
+            @if ($title == 'Setting Account')
+                <li class="menu-item active">
+                @else
+                <li class="menu-item">
+            @endif
             <li class="menu-item">
-                <a href="{{ route('list.collager') }}" class="menu-link">
-                    <div class="text-truncate" data-i18n="Without navbar"> Akun mahasiswa </div>
+                <a href="{{ route('transaction.approval') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-store"></i>
+                    <div class="text-truncate" data-i18n="Front Pages">Approval Peminjaman </div>
                 </a>
             </li>
-        </ul>
-        </li>
-        <li class="menu-header small text-uppercase"><span class="menu-header-text"> Stok Buku </span></li>
-        @if ($title == 'Data Stok Buku')
-            <li class="menu-item active">
-            @else
-            <li class="menu-item">
-        @endif
-        <!-- Unit -->
-        <li class="menu-item">
-            <a href="{{ route('stock.data') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-store"></i>
-                <div class="text-truncate" data-i18n="Front Pages">Data Stok </div>
+
+            {{-- khusus hak akses admin --}}
+            <!-- Setting -->
+            <li class="menu-header small text-uppercase"><span class="menu-header-text"> Setting </span></li>
+            @if ($title == 'Setting Account')
+                <li class="menu-item active">
+                @else
+                <li class="menu-item">
+            @endif
+
+            <a href="#" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-layout"></i>
+                <div class="text-truncate" data-i18n="Layouts"> Setting </div>
             </a>
-        </li>
+            <ul class="menu-sub">
+
+                <li class="menu-item">
+                    <a href="/approval" class="menu-link">
+                        <div class="text-truncate" data-i18n="Without navbar"> Akun dosen </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ route('list.collager') }}" class="menu-link">
+                        <div class="text-truncate" data-i18n="Without navbar"> Akun mahasiswa </div>
+                    </a>
+                </li>
+            </ul>
+            </li>
+            <li class="menu-header small text-uppercase"><span class="menu-header-text"> Stok Buku </span></li>
+            @if ($title == 'Data Stok Buku')
+                <li class="menu-item active">
+                @else
+                <li class="menu-item">
+            @endif
+            <!-- Unit -->
+            <li class="menu-item">
+                <a href="{{ route('stock.data') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-store"></i>
+                    <div class="text-truncate" data-i18n="Front Pages">Data Stok </div>
+                </a>
+            </li>
+        @endif
+
     </ul>
 </aside>
