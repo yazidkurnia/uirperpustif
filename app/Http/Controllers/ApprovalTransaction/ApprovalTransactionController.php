@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ApprovalTransaction;
 
+use App\Models\Book\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\BookStock\BookStock;
@@ -63,13 +64,14 @@ class ApprovalTransactionController extends Controller
     
         // Ambil data detail transaksi berdasarkan ID transaksi
         $getDetailTransaksi = TransactionDetail::where('transaction_id', $getDataTransaksi->id)->get();
-    
         // Mengambil sekumpulan book_id yang unik
         $bookIds = $getDetailTransaksi->pluck('book_id')->unique();
-    
-        // Mengambil data dari tabel book_stocks berdasarkan sekumpulan book_id
-        $bookStocks = BookStock::whereIn('book_id', $bookIds)->get();
 
+        $bookCategory = Book::whereIn('id', $bookIds)->get();
+
+        $categoryIds = $bookCategory->pluck('category_id')->unique();
+        // Mengambil data dari tabel book_stocks berdasarkan sekumpulan book_id
+        $bookStocks = BookStock::whereIn('category_id', $categoryIds)->get();
         // cek apakah data transaksi telah di approve sebelumnya
         if($getDataTransaksi->status_approval == 'Approved'){
             return response()->json([
@@ -88,17 +90,21 @@ class ApprovalTransactionController extends Controller
 
             // Update stock untuk setiap book_stock
             foreach ($bookStocks as $bookStock) {
+                $i = 0;
                 // Misalnya, kita ingin mengurangi total stock berdasarkan jumlah yang dipinjam
                 // Anda perlu menyesuaikan logika ini sesuai dengan kebutuhan Anda
-                $jumlahDipinjam = count($getDetailTransaksi->where('book_id', $bookStock->book_id)); // Asumsi ada kolom 'jumlah' di TransactionDetail
-    
+                $jumlahDipinjam = count($getDetailTransaksi->where('book_id', $bookIds[$i])); // Asumsi ada kolom 'jumlah' di TransactionDetail
+                var_dump($bookIds[$i]);
+                // var_dump($getDetailTransaksi);
+                var_dump($bookStock->book_id);
                 // Update total stock
                 $bookStock->total -= $jumlahDipinjam;
                 // dd($bookStock->total);
                 // Simpan perubahan
                 $bookStock->save();
+                $i++;
             }
-    
+    // die;
             // Commit transaksi jika semua operasi berhasil
             DB::commit();
     
