@@ -26,7 +26,7 @@
         <!-- Unit -->
         <li class="menu-item">
             <a href="{{ route('data.loaning') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-store"></i>
+                <i class="menu-icon tf-icons bx bx-book-alt"></i>
                 <div class="text-truncate" data-i18n="Front Pages">Peminjaman </div>
             </a>
         </li>
@@ -38,7 +38,7 @@
         </li> --}}
         <li class="menu-item">
             <a href="/unit" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-store"></i>
+                <i class="menu-icon tf-icons bx bx-archive-in"></i>
                 <div class="text-truncate" data-i18n="Front Pages">Pengembalian </div>
             </a>
         </li>
@@ -51,7 +51,7 @@
             @endif
             <li class="menu-item">
                 <a href="{{ route('report.transaction') }}" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-store"></i>
+                    <i class="menu-icon tf-icons bx bx-analyse"></i>
                     <div class="text-truncate" data-i18n="Front Pages">Laporan Peminjaman dan Pengembalian </div>
                 </a>
             </li>
@@ -64,7 +64,7 @@
             @endif
             <li class="menu-item">
                 <a href="{{ route('transaction.approval') }}" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-store"></i>
+                    <i class="menu-icon tf-icons bx bx-check-square"></i>
                     <div class="text-truncate" data-i18n="Front Pages">Approval Peminjaman </div>
                 </a>
             </li>
@@ -79,7 +79,7 @@
             @endif
 
             <a href="#" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons bx bx-layout"></i>
+                <i class="menu-icon tf-icons bx bx-cog"></i>
                 <div class="text-truncate" data-i18n="Layouts"> Setting </div>
             </a>
             <ul class="menu-sub">
@@ -92,6 +92,11 @@
                 <li class="menu-item">
                     <a href="{{ route('list.collager') }}" class="menu-link">
                         <div class="text-truncate" data-i18n="Without navbar"> Akun mahasiswa </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="{{ route('category.list') }}" class="menu-link">
+                        <div class="text-truncate" data-i18n="Without navbar"> Kategori </div>
                     </a>
                 </li>
             </ul>
