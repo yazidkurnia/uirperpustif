@@ -41,7 +41,7 @@ class TransactionController extends Controller
             'books.penulis',
             'books.tahun_terbit',
             'books.penerbit')
-            ->join('book_stocks', 'book_stocks.book_id', '=', 'books.id')->get();
+            ->join('book_stocks', 'book_stocks.category_id', '=', 'books.category_id')->get();
         foreach ($dataBuku as $list) {
             $list->book_id = Crypt::encryptString($list->book_id);
             $list->stock_id = Crypt::encryptString($list->stock_id);
@@ -92,18 +92,24 @@ class TransactionController extends Controller
     public function store_data_peminjaman(Request $request){
         $bookId          = $request->book_id != '' ? is_int((int)Crypt::decryptString($request->book_id)) ? (int)Crypt::decryptString($request->book_id) != 0 ? (int)Crypt::decryptString($request->book_id) : NULL : NULL : NULL;
         $tglPeminjaman   = $request->tanggal_pinjam;
-        $additionalBooks  = $request->addional_books;
+        $additionalBooks  = [];
+
+        if (isset($request->addional_books)) {
+            $additionalBooks = $request->addional_books;
+        }
         // Initialize an array to hold the decrypted values
         $decryptedBooks = [];
 
-        foreach ($additionalBooks as $book) {
-            try {
-                // Decrypt the book ID
-                $decryptedBookId = Crypt::decryptString($book);
-                $decryptedBooks[] = $decryptedBookId; // Store the decrypted ID
-            } catch (DecryptException $e) {
-                // Handle the exception if decryption fails
-                return redirect()->back()->withErrors('Failed to decrypt book ID: ' . $e->getMessage());
+        if (!empty($additionalBooks)) {
+            foreach ($additionalBooks as $book) {
+                try {
+                    // Decrypt the book ID
+                    $decryptedBookId = Crypt::decryptString($book);
+                    $decryptedBooks[] = $decryptedBookId; // Store the decrypted ID
+                } catch (DecryptException $e) {
+                    // Handle the exception if decryption fails
+                    return redirect()->back()->withErrors('Failed to decrypt book ID: ' . $e->getMessage());
+                }
             }
         }
 
@@ -156,12 +162,15 @@ class TransactionController extends Controller
 
             $transaction->qr_url = $dataUri;
             $transaction->save();
-            // additional book
-            for($i = 0; $i < count($decryptedBooks); $i++){
-                TransactionDetail::create([
-                    'transaction_id' => $transaction->id,
-                    'book_id'        => $decryptedBooks[$i]
-                ]);
+
+            if (!empty($additionalBooks)) {
+                // additional book
+                for($i = 0; $i < count($decryptedBooks); $i++){
+                    TransactionDetail::create([
+                        'transaction_id' => $transaction->id,
+                        'book_id'        => $decryptedBooks[$i]
+                    ]);
+                }
             }
     
             // choosed book
