@@ -92,16 +92,31 @@
             console.log(tanggalPinjam);
             console.log(bookIds);
 
-            $.ajax({
-                url: '{{ route('transaction.store') }}',
-                type: "POST",
-                data: {
+            var data;
+
+            console.log(bookIds[0] == '');
+
+            if (bookIds[0] == '') {
+                data = {
                     _token: csrfToken,
                     book_id: bookId,
                     tanggal_pinjam: tanggalPinjam,
                     tanggal_kembali: tanggalKembali,
-                    addional_books: bookIds
-                },
+                };
+            } else {
+                data = {
+                    _token: csrfToken,
+                    book_id: bookId,
+                    tanggal_pinjam: tanggalPinjam,
+                    tanggal_kembali: tanggalKembali,
+                    addional_books: bookIds ?? null
+                };
+            }
+
+            $.ajax({
+                url: '{{ route('transaction.store') }}',
+                type: "POST",
+                data: data,
                 success: function(data) {
                     Swal.fire({
                         icon: "success",
