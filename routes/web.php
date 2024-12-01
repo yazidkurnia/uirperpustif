@@ -10,6 +10,7 @@ use App\Http\Controllers\EmployeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Loan\LoanController;
 use App\Http\Controllers\Stock\StockController;
+use App\Http\Controllers\Category\CategoryController;
 use App\Http\Middleware\Rolechekmiddleware\CheckUserRole;
 use App\Http\Controllers\Transaction\TransactionController;
 use App\Http\Controllers\Report\ReportTransactionController;
@@ -18,12 +19,7 @@ use App\Http\Controllers\CollagerController\CollagerController;
 use App\Http\Controllers\ApprovalTransaction\ApprovalTransactionController;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return View('wellcome');
 });
 
 // Route::get('/dashboard', function () {
@@ -62,6 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/list-waiting-transaction', [ApiDataTableController::class,'api_datatable_approve_peminjaman'])->name('transaksi_peminjaman.datatable');
     Route::get('/data/buku/peminjaman-user', [ApiDataTableController::class,'api_datatable_users_book'])->name('users.loaning.books');
     Route::get('/list/stok', [ApiDataTableController::class, 'api_datatable_book_stock'])->name('api.data.stock');
+    Route::get('/list/category/datatable',  [ApiDataTableController::class, 'api_datatable_category_book'])->name('api.category.datatable');
 
     ############################################# all about approval ###############################################
     Route::post('/approval-peminjaman', [ApprovalTransactionController::class, 'approve_transaksi_peminjaman'])->name('transaction.approval.peminjaman');
@@ -88,6 +85,13 @@ Route::middleware(['auth', 'role'])->group(function () {
     Route::put('/update-user-role', [UsersController::class, 'user_update_role'])->name('user.update.role');
     Route::post('/set-account', [UsersController::class, 'set_account'])->name('setting.user.account');
     Route::delete('/user/delete', [UsersController::class, 'delete_user'])->name('user.delete.account');
+
+    ############################################ all about category ##############################################@
+    Route::get('/category/list', [CategoryController::class, 'index'])->name('category.list');
+    Route::post('/add/category', [CategoryController::class, 'store'])->name('category.store');
+    Route::get('/edit/category', [CategoryController::class, 'edit'])->name('category.edit');
+    Route::put('/update/category/{id}', [CategoryController::class, 'update'])->name('category.update');
+    Route::delete('/delete/category', [CategoryController::class, 'destroy'])->name('category.destroy');
 });
 
 Route::get('image/qrcode/{text}', [
