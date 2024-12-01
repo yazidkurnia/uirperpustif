@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ApiDataTable;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\Category\Category;
 use App\Models\Collager\Collager;
 use App\Models\BookStock\BookStock;
 use App\Http\Controllers\Controller;
@@ -117,6 +118,11 @@ class ApiDataTableController extends Controller
             ->get();
         }
 
+        if (Auth::user()->roleid == 1) {
+            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval', 'transactions.qr_url')->join('users', 'users.id', '=', 'transactions.userid')
+            ->get();
+        }
+
         $data = [];
         foreach ($dataBukuPinjam as $list) {
             // var_dump($list->qr_url);
@@ -137,31 +143,60 @@ class ApiDataTableController extends Controller
             }
 
             $tenggatPengembalian = date_diff($dateTglPinjam, $tglKembali);
-            $data[] = [
-                'action' => '<td><div class="btn-group">' .
-                            '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
-                            '<ul class="dropdown-menu dropdown-menu-start" style="">' .
-                            '<li>' .
-                            '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="cancel_peminjaman(\'' .
-                            Crypt::encryptString($list->id) .'\')">Cancel</button>' . 
-                            '</li>' .
-                            '<li>' .
-                            '<button type="button" class="btn btn-white text-left btn-sm" onclick="show_qr_image(\''. asset($list->qr_url) .'\')">View Qr Code</button>' . 
-                            '</li>' .
-                            '<li>' .
-                            '<button type="button" class="btn btn-white text-left btn-sm">Download Qr Code</button>' . 
-                            '</li>' .
-                            // Hapus parameter 'mahasiswa'
-                            '</ul>' .
-                            '</div>' .
-                            '</td>',
-                'npm' => $list->unique_code,
-                'nama'=> $list->nama,
-                'tgl_pinjam' => $list->tgl_pinjam,
-                'tgl_wajib_kembali' => $list->tgl_wajib_kembali,
-                'tenggat' => $tenggatPengembalian->format("%R%a days"),
-                'status_approval' => $statusApproval
-            ];
+            if (Auth::user()->roleid == 1) {
+                $data[] = [
+                    'action' => '<td><div class="btn-group">' .
+                                '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                                '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                                '<li>' .
+                                '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="cancel_peminjaman(\'' .
+                                Crypt::encryptString($list->id) .'\')">Cancel</button>' . 
+                                '</li>' .
+                                '<li>' .
+                                '<button type="button" class="btn btn-white text-left btn-sm" onclick="show_qr_image(\''. asset($list->qr_url) .'\')">View Qr Code</button>' . 
+                                '</li>' .
+                                '<li>' .
+                                '<button type="button" class="btn btn-white text-left btn-sm">Download Qr Code</button>' . 
+                                '</li>' .
+                                // Hapus parameter 'mahasiswa'
+                                '</ul>' .
+                                '</div>' .
+                                '</td>',
+                    'npm' => 'admin-account',
+                    'nama'=> $list->nama,
+                    'tgl_pinjam' => $list->tgl_pinjam,
+                    'tgl_wajib_kembali' => $list->tgl_wajib_kembali,
+                    'tenggat' => $tenggatPengembalian->format("%R%a days"),
+                    'status_approval' => $statusApproval
+                ];
+            }else{
+                $data[] = [
+                    'action' => '<td><div class="btn-group">' .
+                                '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                                '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                                '<li>' .
+                                '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="cancel_peminjaman(\'' .
+                                Crypt::encryptString($list->id) .'\')">Cancel</button>' . 
+                                '</li>' .
+                                '<li>' .
+                                '<button type="button" class="btn btn-white text-left btn-sm" onclick="show_qr_image(\''. asset($list->qr_url) .'\')">View Qr Code</button>' . 
+                                '</li>' .
+                                '<li>' .
+                                '<button type="button" class="btn btn-white text-left btn-sm">Download Qr Code</button>' . 
+                                '</li>' .
+                                // Hapus parameter 'mahasiswa'
+                                '</ul>' .
+                                '</div>' .
+                                '</td>',
+                    'npm' => $list->unique_code,
+                    'nama'=> $list->nama,
+                    'tgl_pinjam' => $list->tgl_pinjam,
+                    'tgl_wajib_kembali' => $list->tgl_wajib_kembali,
+                    'tenggat' => $tenggatPengembalian->format("%R%a days"),
+                    'status_approval' => $statusApproval
+                ];
+            }
+  
         }
 
         return response()->json([
@@ -190,4 +225,37 @@ class ApiDataTableController extends Controller
         ], 200);
     }
 
+    public function api_datatable_category_book(){
+        $dataCategory = Category::get();
+        $data=[];
+
+        foreach ($dataCategory as $list) {
+            $data[]=[
+                'action' => '<td><div class="btn-group">' .
+                '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                '<li>' .
+                '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal">Cancel</button>' . 
+                '</li>' .
+                '<li>' .
+                '<button type="button" class="btn btn-white text-left btn-sm">View Qr Code</button>' . 
+                '</li>' .
+                '<li>' .
+                '<button type="button" class="btn btn-white text-left btn-sm">Download Qr Code</button>' . 
+                '</li>' .
+                // Hapus parameter 'mahasiswa'
+                '</ul>' .
+                '</div>' .
+                '</td>',
+                'id' => Crypt::encryptString($list->id),
+                'category_name' => $list->category_name
+            ];
+        }
+
+        return response()->json([
+            'success' => TRUE,
+            'message' => 'Data category berhasil didapatkan.',
+            'data' => $data,
+        ], 200);
+    }
 }
