@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ApiDataTable;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\Lecture\Lecture;
 use App\Models\Category\Category;
 use App\Models\Collager\Collager;
 use App\Models\BookStock\BookStock;
@@ -156,7 +157,7 @@ class ApiDataTableController extends Controller
                                 '<button type="button" class="btn btn-white text-left btn-sm" onclick="show_qr_image(\''. asset($list->qr_url) .'\')">View Qr Code</button>' . 
                                 '</li>' .
                                 '<li>' .
-                                '<button type="button" class="btn btn-white text-left btn-sm">Download Qr Code</button>' . 
+                                '<button type="button" class="btn btn-white text-left btn-sm" onclick="downloadQrImage(\''. asset($list->qr_url) .'\')">Download Qr Code</button>' . 
                                 '</li>' .
                                 // Hapus parameter 'mahasiswa'
                                 '</ul>' .
@@ -227,10 +228,10 @@ class ApiDataTableController extends Controller
 
     public function api_datatable_category_book(){
         $dataCategory = Category::get();
-        $data=[];
-
+        $data = [];
+    
         foreach ($dataCategory as $list) {
-            $data[]=[
+            $data[] = [
                 'action' => '<td><div class="btn-group">' .
                 '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
                 '<ul class="dropdown-menu dropdown-menu-start" style="">' .
@@ -238,17 +239,45 @@ class ApiDataTableController extends Controller
                 '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal">Cancel</button>' . 
                 '</li>' .
                 '<li>' .
-                '<button type="button" class="btn btn-white text-left btn-sm">View Qr Code</button>' . 
+                '<a type="button" id="btnEdit" class="btn btn-white text-left btn-sm mx-5" onclick="edit(\'' . Crypt::encryptString($list->id) . '\', \'' .$list->category_name. '\')">'.'<i class="bx bxs-edit-alt"></i>'.' Edit</a>' . 
                 '</li>' .
                 '<li>' .
-                '<button type="button" class="btn btn-white text-left btn-sm">Download Qr Code</button>' . 
+                '<button type="button" class="btn btn-white text-left btn-sm" onclick="remove(\'' . Crypt::encryptString($list->id) . '\')">Delete</button>' . 
                 '</li>' .
-                // Hapus parameter 'mahasiswa'
                 '</ul>' .
                 '</div>' .
                 '</td>',
                 'id' => Crypt::encryptString($list->id),
                 'category_name' => $list->category_name
+            ];
+        }
+    
+        return response()->json([
+            'success' => TRUE,
+            'message' => 'Data category berhasil didapatkan.',
+            'data' => $data,
+        ], 200);
+    }
+
+    public function api_datatable_settup_admin_akses(){
+        $dataAkunDosen = Lecture::all();
+
+        $data = [];
+        foreach ($dataAkunDosen as $list) {
+            $data[] = [
+                'action' => '<td><div class="btn-group">' .
+                '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                '<li>' .
+                '<button type="button" class="btn btn-white btn-sm" onclick="setAsAdm(/'.Crypt::encryptString($list->id).'/)">Set as admin</button>' . 
+                '</li>' .
+                // Hapus parameter 'mahasiswa'
+                '</ul>' .
+                '</div>' .
+                '</td>',
+                'nidn' => $list->nidn,
+                'id' => Crypt::encryptString($list->id),
+                'nama' => $list->nama
             ];
         }
 

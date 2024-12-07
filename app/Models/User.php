@@ -26,6 +26,7 @@ class User extends Authenticatable
         'roleid',
         'collagerid',
         'employeid',
+        'lectureid',
         'created_at',
         'updated_at'
     ];
