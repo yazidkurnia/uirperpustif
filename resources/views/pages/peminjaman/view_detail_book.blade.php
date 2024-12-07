@@ -118,18 +118,26 @@
                 type: "POST",
                 data: data,
                 success: function(data) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Yeay...",
-                        text: "Berhasil menambahkan data!"
-                    });
+                    if (data.success == true) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Yeay...",
+                            text: "Berhasil menambahkan data!"
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Yeay...",
+                            text: data.message + "!"
+                        });
+                    }
+                    $('#exampleModal').modal('hide');
                 },
-                error: function(data) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oups...",
-                        text: "Maaf terjadi kesalahan pada saat menyimpan data, periksa kembali data yang anda inputkan!"
-                    });
+                error: function(xhr, status, error) {
+                    // Fungsi ini akan dipanggil jika terjadi kesalahan
+                    console.error('Error:', error);
+                    console.error('Status:', status);
+                    alert('Terjadi kesalahan saat mengambil data: ' + xhr.statusText);
                 }
             })
         }

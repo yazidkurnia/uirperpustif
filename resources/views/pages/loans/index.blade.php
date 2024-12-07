@@ -86,6 +86,7 @@
                 type: 'GET',
                 success: function(data) {
                     var item = data.data;
+                    $('#dataTable tbody').empty();
                     console.log(data); // Debugging data response
                     $('#' + idTable + ' tbody').empty(); // Clear existing rows
                     $.each(item, function(index, item) {
@@ -122,6 +123,30 @@
             $('#modalToggle').modal('show');
         }
 
+        function downloadQrImage(filePath) {
+            var filename = filePath.split('/').pop(); // Mengambil nama file dari path
+
+            $.ajax({
+                url: '{{ route('download.qr.image', ':filename') }}'.replace(':filename', filename),
+                type: 'GET',
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function(data) {
+                    var url = window.URL.createObjectURL(new Blob([data]));
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                },
+                error: function(error) {
+                    console.log(error);
+                    alert('Failed to download image.');
+                }
+            });
+        }
         // $(document).ready(function() {
         //     // Custom search functionality
         //     $('#searchInput').on('keyup', function() {

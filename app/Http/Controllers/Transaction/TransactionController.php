@@ -113,6 +113,7 @@ class TransactionController extends Controller
             }
         }
 
+        # pengecekan apakah ada peminjaman untuk buku yang sama
         if (in_array($bookId, $decryptedBooks)) {
             $duplikatBook = Book::find($bookId);
             return response()->json([
@@ -122,6 +123,7 @@ class TransactionController extends Controller
             ], 400);
         }
         
+        # pengecekan jika tanggal peminjaman tidak dipilih
         if(!$request->tanggal_pinjam){
             return response()->json([
                 'success' => FALSE,
@@ -130,11 +132,37 @@ class TransactionController extends Controller
             ], 400);
         }
 
-        // Membuat objek DateTime dari tanggal yang diberikan
+        if (count($decryptedBooks) > 1) {
+            return response()->json([
+                'success' => FALSE,
+                'message' => 'Terjadi kesalahan, Tidak diizinkan melakukan peminjaman dengan jumlah buku lebih dari 2!.',
+                'data'    => [],
+            ], 400);
+        }
+
+        // $nowDate = ''.date('Y-m-d').'';
+
+        // dd($nowDate);
+        # pengecekan transaksi pada tanggal yang sama
+        $getTransaction = Transaction::where([
+            'userid' => Auth::user()->id,
+            'tgl_pinjam' => $tglPeminjaman,
+            'status_approval' => 'Waiting',
+            'jenis_transaksi' => 'Peminjaman'
+            ])->get();
+
+        if (count($getTransaction) > 1){
+            return response()->json([
+                'success' => FALSE,
+                'message' => 'Terjadi kesalahan, Tidak dapat meminjam buku pada tanggal yang sama!.',
+                'data'    => [],
+            ], 400);
+        }
+        # Membuat objek DateTime dari tanggal yang diberikan
         $tglPengembalian = new DateTime($tglPeminjaman);
 
-        // Menambahkan 5 hari
-        $tglPengembalian->modify('+5 days');
+        # Menambahkan 5 hari
+        $tglPengembalian->modify('+7 days');
 
         if ($bookId == NULL){
             return response()->json([

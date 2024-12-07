@@ -95,6 +95,11 @@
                     </a>
                 </li>
                 <li class="menu-item">
+                    <a href="{{ route('admin.setup.adm.account') }}" class="menu-link">
+                        <div class="text-truncate" data-i18n="Without navbar"> Setting Account Admin </div>
+                    </a>
+                </li>
+                <li class="menu-item">
                     <a href="{{ route('category.list') }}" class="menu-link">
                         <div class="text-truncate" data-i18n="Without navbar"> Kategori </div>
                     </a>

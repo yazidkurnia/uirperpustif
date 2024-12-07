@@ -56,4 +56,20 @@ class LoanController extends Controller
 
         return view('pages.user_loaning.index', $data);
     }
+
+    public function download_qr_image(string $qrUrl){
+        $filePath = public_path(asset('assets/generated_qr/' . $qrUrl));
+
+        // dd(asset('assets/generated_qr/' . $qrUrl));
+    
+        if (file_exists('assets/generated_qr/' . $qrUrl)) {
+            return response()->download('assets/generated_qr/' . $qrUrl);
+        } else {
+            return response()->json([
+                'success' => FALSE,
+                'message' => 'File not found.',
+            ], 404);
+        }
+    }
+    
 }
