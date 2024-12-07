@@ -9,6 +9,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EmployeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Loan\LoanController;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Stock\StockController;
 use App\Http\Controllers\Category\CategoryController;
 use App\Http\Middleware\Rolechekmiddleware\CheckUserRole;
@@ -66,6 +67,7 @@ Route::middleware('auth')->group(function () {
     ############################################# all about data peminjaman ########################################
     Route::get('/user/peminjaman',[ LoanController::class, 'index'])->name('data.loaning');
     Route::get('/user/loaning', [LoanController::class, 'peminjaman_by_userid'])->name('loaning.by.userid');
+    Route::get('/download/qr/image/{filePath}', [LoanController::class, 'download_qr_image'])->name('download.qr.image');
 
     ############################################# all about reporting ##############################################
     Route::get('/report/pp', [ReportTransactionController::class, 'index'])->name('report.transaction');
@@ -90,8 +92,13 @@ Route::middleware(['auth', 'role'])->group(function () {
     Route::get('/category/list', [CategoryController::class, 'index'])->name('category.list');
     Route::post('/add/category', [CategoryController::class, 'store'])->name('category.store');
     Route::get('/edit/category', [CategoryController::class, 'edit'])->name('category.edit');
-    Route::put('/update/category/{id}', [CategoryController::class, 'update'])->name('category.update');
+    Route::put('/update/category', [CategoryController::class, 'update'])->name('category.update');
     Route::delete('/delete/category', [CategoryController::class, 'destroy'])->name('category.destroy');
+
+    ###########################################@ setting akun admin ###############################################
+    Route::get('/api-setup/adm', [ApiDataTableController::class, 'api_datatable_settup_admin_akses'])->name('api.datatable.setup.admin');
+    Route::get('/setting-adm-account', [AdminController::class, 'index'])->name('admin.setup.adm.account');
+    Route::PUT('/set-as-admin', [AdminController::class, 'update_role_to_admin'])->name('update.role.to.admin');
 });
 
 Route::get('image/qrcode/{text}', [
