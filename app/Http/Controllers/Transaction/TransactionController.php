@@ -10,16 +10,17 @@ use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Label\Label;
 use Illuminate\Support\Facades\DB;
+use App\Models\BookStock\BookStock;
 use App\Http\Controllers\Controller;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Auth;
 use Endroid\QrCode\Encoding\Encoding;
 use Illuminate\Support\Facades\Crypt;
 use Endroid\QrCode\RoundBlockSizeMode;
+use App\Http\Helpers\QrGeneratorHelper;
 use App\Models\Transaction\Transaction;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use App\Models\TransactionDetail\TransactionDetail;
-use App\Http\Helpers\QrGeneratorHelper;
 
 class TransactionController extends Controller
 {
@@ -282,18 +283,46 @@ class TransactionController extends Controller
                     'data'    => [],
                 ], 404);
             }
+
+            if ($transaction->status_approval == 'Approved') {
+                return response()->json([
+                    'success' => FALSE,
+                    'message' => 'Maaf, tidak dapat menghapus data, karena transaksi telah disetujui, silahkan hubungi admin.',
+                    'data'    => [],
+                ], 400);
+            }
     
             // Get transaction details
             $transactionDetail = TransactionDetail::where('transaction_id', $validTransactionId)->get();
     
+            $transactionDetailIds = [];
+            $multipleBookIds = [];
             // Delete the transaction details
             foreach ($transactionDetail as $detail) {
+                $transactionDetailIds[] = $detail->id;
+                $multipleBookIds[]      = $detail->book_id;
                 $detail->delete();
             }
-    
+
+            // mengambil data buku yang terlambatkan denda
+            $getLoanedBook = Book::whereIn('id', $multipleBookIds)->get();
+
+            $bookCategoryIds = [];
+            foreach ($getLoanedBook as $list){
+                $bookCategoryIds[]=$list->category_id;
+            }
+
+            // ambil data stock
+            $getBookStock = BookStock::whereIn('category_id', $bookCategoryIds)->get();
+            
+            foreach ($getBookStock as $list){
+                $list->total += 1;
+                $list->save();
+            }
+
             // Delete the transaction
             $transaction->delete();
-    
+
             // Commit the transaction
             DB::commit();
     
@@ -309,7 +338,7 @@ class TransactionController extends Controller
             DB::rollBack();
             return response()->json([
                 'success' => FALSE,
-                'message' => 'Terjadi kesalahan, silahkan hubungi administrator.',
+                'message' => 'Terjadi kesalahan, silahkan hubungi administrator: ' . $e,
                 'data'    => [],
             ], 500);
         }

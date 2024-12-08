@@ -73,7 +73,7 @@
                     Swal.fire({
                         icon: "error",
                         title: "Oups...",
-                        text: data.message
+                        text: 'Tidak dapat menghapus data'
                     });
 
                 }
