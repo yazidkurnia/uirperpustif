@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ApiDataTable;
 
 use App\Models\User;
+use App\Models\Book\Book;
 use Illuminate\Http\Request;
 use App\Models\Lecture\Lecture;
 use App\Models\Category\Category;
@@ -284,6 +285,193 @@ class ApiDataTableController extends Controller
         return response()->json([
             'success' => TRUE,
             'message' => 'Data category berhasil didapatkan.',
+            'data' => $data,
+        ], 200);
+    }
+
+    public function api_datatable_dosen(){
+        $dataAkunDosen = Lecture::all();
+
+        $data = [];
+        foreach ($dataAkunDosen as $list) {
+            $data[] = [
+                'action' => '<td><div class="btn-group">' .
+                '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                '<li>' .
+                '<button type="button" class="btn btn-white btn-sm" onclick="#(/'.Crypt::encryptString($list->id).'/)">Aktivasi Akun</button>' . 
+                '</li>' .
+                // Hapus parameter 'mahasiswa'
+                '</ul>' .
+                '</div>' .
+                '</td>',
+                'nidn' => $list->nidn,
+                'id' => Crypt::encryptString($list->id),
+                'nama' => $list->nama,
+                'email' => $list->email
+            ];
+        }
+
+        return response()->json([
+            'success' => TRUE,
+            'message' => 'Data category berhasil didapatkan.',
+            'data' => $data,
+        ], 200);
+    }
+
+    public function api_datatable_book(){
+        $dataBuku = Book::select(
+            'books.id as book_id', 
+            'category_name as nama_kategori', 
+            'books.judul',
+            'books.penulis',
+            'books.tahun_terbit',
+            'books.no_revisi',
+            'books.penerbit')
+            ->join('categories', 'categories.id', '=', 'category_id')->get();;
+        $data=[];
+
+        foreach ($dataBuku as $list) {
+            $data[]=[
+                'action' => '<td><div class="btn-group">' .
+                '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                '<li>' .
+                '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#">Cancel</button>' . 
+                '</li>' .
+                '<li>' .
+                '<a type="button" id="btnEdit" class="btn btn-white text-left btn-sm mx-5" onclick="edit(\'' . Crypt::encryptString($list->book_id) . '\', \'' .$list->judul. '\', \'' .$list->penulis. '\', \'' .$list->penerbit. '\', \'' .$list->tahun_terbit. '\', \'' .$list->no_revisi. '\')">'.'<i class="bx bxs-edit-alt"></i>'.' Edit</a>' . 
+                '</li>' .
+                '<li>' .
+                '<button type="button" class="btn btn-white text-left btn-sm" onclick="remove(\'' . Crypt::encryptString($list->book_id) . '\')">Delete</button>' . 
+                '</li>' .
+                '</ul>' .
+                '</div>' .
+                '</td>', 
+                'id' => Crypt::encryptString($list->book_id),
+                'judul' => $list->judul,
+                'penulis' => $list->penulis,
+                'kategori' => $list->nama_kategori,
+                'penerbit' => $list->penerbit
+            ];
+        }
+
+        return response()->json([
+            'success' => TRUE,
+            'message' => 'Data category berhasil didapatkan.',
+            'data' => $data,
+        ], 200);
+        
+    }
+
+    public function api_datatable_return_book(){
+
+        $dataBukuPinjam = [];
+
+        if (Auth::user()->roleid == 3) {
+            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'collagers.npm as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval', 'transactions.qr_url')
+            ->join('users', 'users.id', '=', 'transactions.userid')
+            ->join('collagers', 'collagers.id', '=', 'users.collagerid')
+            ->where('userid', Auth::user()->id)
+            ->get();
+        }
+
+        if (Auth::user()->roleid == 2) {
+            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'lectures.nidn as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval', 'transactions.qr_url')->join('users', 'users.id', '=', 'transactions.userid')
+            ->join('lectures', 'lectures.id', '=', 'users.lectureid')
+            ->where('userid', Auth::user()->id)
+            ->get();
+        }
+
+        if (Auth::user()->roleid == 1) {
+            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_return', 'transactions.qr_url')->join('users', 'users.id', '=', 'transactions.userid')
+            ->where('status_approval','Approved')
+            // ->where('status_return', 'Waiting')
+            ->get();
+        }
+
+        // var_dump($dataBukuPinjam);
+
+        $data = [];
+        foreach ($dataBukuPinjam as $list) {
+            // var_dump($list->qr_url);
+            $dateTglPinjam = date_create($list->tgl_pinjam);
+            $tglKembali    = date_create($list->tgl_wajib_kembali);
+            $statusApproval = '';
+
+            if ($list->status_return == 'Waiting'){
+                $statusApproval = '<span class="badge bg-label-warning">'.$list->status_return.'</span>';
+            }
+
+            if ($list->status_return == 'Reject'){
+                $statusApproval = '<span class="badge bg-label-danger">'.$list->status_return.'</span>';
+            }
+
+            if ($list->status_return == 'Approved'){
+                $statusApproval = '<span class="badge bg-label-primary">'.$list->status_return.'</span>';
+            }
+
+            $tenggatPengembalian = date_diff($dateTglPinjam, $tglKembali);
+            if (Auth::user()->roleid == 1) {
+                $data[] = [
+                    'action' => '<td><div class="btn-group">' .
+                                '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                                '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                                '<li>' .
+                                '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="cancel_peminjaman(\'' .
+                                Crypt::encryptString($list->id) .'\')">Cancel</button>' . 
+                                '</li>' .
+                                '<li>' .
+                                '<button type="button" class="btn btn-white text-left btn-sm" onclick="show_qr_image(\''. asset($list->qr_url) .'\')">View Qr Code</button>' . 
+                                '</li>' .
+                                '<li>' .
+                                '<button type="button" class="btn btn-white text-left btn-sm">Download Qr Code</button>' . 
+                                '</li>' .
+                                // Hapus parameter 'mahasiswa'
+                                '</ul>' .
+                                '</div>' .
+                                '</td>',
+                    'id' => Crypt::encryptString($list->id),
+                    'npm' => 'admin-account',
+                    'nama'=> $list->nama,
+                    'tgl_pinjam' => $list->tgl_pinjam,
+                    'tgl_wajib_kembali' => $list->tgl_wajib_kembali,
+                    'tenggat' => $tenggatPengembalian->format("%R%a days"),
+                    'status_return' => $statusApproval
+                ];
+            }else{
+                $data[] = [
+                    'action' => '<td><div class="btn-group">' .
+                                '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                                '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                                '<li>' .
+                                '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="cancel_peminjaman(\'' .
+                                Crypt::encryptString($list->id) .'\')">Cancel</button>' . 
+                                '</li>' .
+                                '<li>' .
+                                '<button type="button" class="btn btn-white text-left btn-sm" onclick="show_qr_image(\''. asset($list->qr_url) .'\')">View Qr Code</button>' . 
+                                '</li>' .
+                                '<li>' .
+                                '<button type="button" class="btn btn-white text-left btn-sm">Download Qr Code</button>' . 
+                                '</li>' .
+                                // Hapus parameter 'mahasiswa'
+                                '</ul>' .
+                                '</div>' .
+                                '</td>',
+                    'npm' => $list->unique_code,
+                    'nama'=> $list->nama,
+                    'tgl_pinjam' => $list->tgl_pinjam,
+                    'tgl_wajib_kembali' => $list->tgl_wajib_kembali,
+                    'tenggat' => $tenggatPengembalian->format("%R%a days"),
+                    'status_approval' => $statusApproval
+                ];
+            }
+  
+        }
+
+        return response()->json([
+            'success' => TRUE,
+            'message' => 'Data mahasiswa berhasil diambil.',
             'data' => $data,
         ], 200);
     }

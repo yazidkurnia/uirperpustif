@@ -56,7 +56,7 @@ class TransactionController extends Controller
     /**
      * pada fungsi ini akan menampilkan data buku berdasarkan id dari buku yang dipilih
      * @param id string (id buku dari table books)
-     */
+     */                                                                                                                     
     public function pengajuan_peminjaman($bookId){
         $validBookId = $bookId != '' ? is_int((int)Crypt::decryptString($bookId)) ? (int)Crypt::decryptString($bookId) != 0 ? (int)Crypt::decryptString($bookId) : NULL  : NULL : NULL;
     
@@ -113,7 +113,6 @@ class TransactionController extends Controller
             }
         }
 
-        # pengecekan apakah ada peminjaman untuk buku yang sama
         if (in_array($bookId, $decryptedBooks)) {
             $duplikatBook = Book::find($bookId);
             return response()->json([
@@ -123,7 +122,6 @@ class TransactionController extends Controller
             ], 400);
         }
         
-        # pengecekan jika tanggal peminjaman tidak dipilih
         if(!$request->tanggal_pinjam){
             return response()->json([
                 'success' => FALSE,
@@ -132,37 +130,11 @@ class TransactionController extends Controller
             ], 400);
         }
 
-        if (count($decryptedBooks) > 1) {
-            return response()->json([
-                'success' => FALSE,
-                'message' => 'Terjadi kesalahan, Tidak diizinkan melakukan peminjaman dengan jumlah buku lebih dari 2!.',
-                'data'    => [],
-            ], 400);
-        }
-
-        // $nowDate = ''.date('Y-m-d').'';
-
-        // dd($nowDate);
-        # pengecekan transaksi pada tanggal yang sama
-        $getTransaction = Transaction::where([
-            'userid' => Auth::user()->id,
-            'tgl_pinjam' => $tglPeminjaman,
-            'status_approval' => 'Waiting',
-            'jenis_transaksi' => 'Peminjaman'
-            ])->get();
-
-        if (count($getTransaction) > 1){
-            return response()->json([
-                'success' => FALSE,
-                'message' => 'Terjadi kesalahan, Tidak dapat meminjam buku pada tanggal yang sama!.',
-                'data'    => [],
-            ], 400);
-        }
-        # Membuat objek DateTime dari tanggal yang diberikan
+        // Membuat objek DateTime dari tanggal yang diberikan
         $tglPengembalian = new DateTime($tglPeminjaman);
 
-        # Menambahkan 5 hari
-        $tglPengembalian->modify('+7 days');
+        // Menambahkan 5 hari
+        $tglPengembalian->modify('+5 days');
 
         if ($bookId == NULL){
             return response()->json([
@@ -232,7 +204,9 @@ class TransactionController extends Controller
      */
     public function detail_peminjaman($id){
         $validTransactionId = $id != '' ? is_int((int)Crypt::decryptString($id)) ? (int)Crypt::decryptString($id) != 0 ? (int)Crypt::decryptString($id) : NULL : NULL : NULL;
-        $data['title'] = 'Detail Peminjaman Buku';
+        
+        
+        
         
         // cek apakah id dai data yang dipilih tidak null
         if ($validTransactionId == NULL) {
@@ -244,13 +218,43 @@ class TransactionController extends Controller
         ->join('books', 'books.id', '=', 'transaction_details.book_id')
         ->where('transaction_id', $validTransactionId)->get();
 
-        $dataTransaksi = Transaction::select('transactions.id', 'users.name', 'users.email', 'transactions.jenis_transaksi', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali')
+        $dataTransaksi = Transaction::select('transactions.id', 'users.name', 'users.email', 'transactions.jenis_transaksi', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval')
         ->where('transactions.id', $validTransactionId)
         ->join('users', 'users.id', '=', 'transactions.userid')
         ->first();
 
+        // dd($dataTransaksi);
+
+        if($dataTransaksi->status_approval == 'Approved'){
+            $data['title'] = 'Detail Pengembalian Buku';
+        } else {
+            $data['title'] = 'Detail Peminjaman Buku';
+        }
+
+        $hariIni = date('Y-m-d');
+        $convertNowDate = New DateTime($hariIni);
+
+        $tglWajibKembali = $dataTransaksi->tgl_wajib_kembali;
+        $convertTglWajibKembali = New DateTime($tglWajibKembali);
+
+        // $interval = $hariIni-$tglWajibKembali;
+
+        // dd($convertNowDate->diff($convertTglWajibKembali)->days);
+
+        if($dataTransaksi->tgl_wajib_kembali < date('Y-m-d')) {
+            $denda = 1000;
+            $banyakBuku = count($detailTransaksiItem);
+            $dif = $convertNowDate->diff($convertTglWajibKembali)->days;
+            $totalDenda = $denda*$dif*$banyakBuku;
+            $data['denda'] = $totalDenda;
+        } else {
+            $data['denda'] = 0;
+        }
+
+
         $data['transaksi'] = $dataTransaksi;
         $data['transaksi_detail'] = $detailTransaksiItem;
+        // dd(count($data['transaksi_detail']));
         $data['transaction_id'] = $id;
 
         // dd($detailTransaksiItem);

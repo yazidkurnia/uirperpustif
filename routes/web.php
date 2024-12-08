@@ -8,9 +8,12 @@ use Illuminate\Foundation\Application;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\EmployeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Book\BookController;
 use App\Http\Controllers\Loan\LoanController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Stock\StockController;
+use App\Http\Controllers\Return\ReturnController;
+use App\Http\Controllers\Lecture\LectureController;
 use App\Http\Controllers\Category\CategoryController;
 use App\Http\Middleware\Rolechekmiddleware\CheckUserRole;
 use App\Http\Controllers\Transaction\TransactionController;
@@ -60,6 +63,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/data/buku/peminjaman-user', [ApiDataTableController::class,'api_datatable_users_book'])->name('users.loaning.books');
     Route::get('/list/stok', [ApiDataTableController::class, 'api_datatable_book_stock'])->name('api.data.stock');
     Route::get('/list/category/datatable',  [ApiDataTableController::class, 'api_datatable_category_book'])->name('api.category.datatable');
+    Route::get('/data/buku/pengembalian-user', [ApiDataTableController::class,'api_datatable_return_book'])->name('users.return.books');
+    Route::get('/data/buku', [ApiDataTableController::class,'api_datatable_book'])->name('api.books.data');
 
     ############################################# all about approval ###############################################
     Route::post('/approval-peminjaman', [ApprovalTransactionController::class, 'approve_transaksi_peminjaman'])->name('transaction.approval.peminjaman');
@@ -68,12 +73,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/user/peminjaman',[ LoanController::class, 'index'])->name('data.loaning');
     Route::get('/user/loaning', [LoanController::class, 'peminjaman_by_userid'])->name('loaning.by.userid');
     Route::get('/download/qr/image/{filePath}', [LoanController::class, 'download_qr_image'])->name('download.qr.image');
+    Route::get('/pengembalian',[ ReturnController::class, 'index'])->name('data.return');
 
     ############################################# all about reporting ##############################################
     Route::get('/report/pp', [ReportTransactionController::class, 'index'])->name('report.transaction');
 
     ############################################# all about stock ##################################################
     Route::get('/all-stock', [StockController::class, 'index'])->name('stock.data');
+
+    
 
 });
 
@@ -83,6 +91,7 @@ Route::middleware(['auth', 'role'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/collager', [CollagerController::class, 'index'])->name('list.collager');
+    Route::get('/lectures', [LectureController::class, 'index'])->name('list.lectures');
     ############################################ all about setting account ########################################
     Route::put('/update-user-role', [UsersController::class, 'user_update_role'])->name('user.update.role');
     Route::post('/set-account', [UsersController::class, 'set_account'])->name('setting.user.account');
@@ -95,10 +104,17 @@ Route::middleware(['auth', 'role'])->group(function () {
     Route::put('/update/category', [CategoryController::class, 'update'])->name('category.update');
     Route::delete('/delete/category', [CategoryController::class, 'destroy'])->name('category.destroy');
 
+    ############################################# all about buku ##################################################
+    Route::get('/buku',[ BookController::class, 'index'])->name('data.book');
+    Route::post('/tambah-buku', [BookController::class, 'store'])->name('book.store');
+    Route::put('/update/book', [BookController::class, 'update'])->name('book.update');
+    Route::delete('/delete/book', [BookController::class, 'destroy'])->name('book.destroy');
+
     ###########################################@ setting akun admin ###############################################
     Route::get('/api-setup/adm', [ApiDataTableController::class, 'api_datatable_settup_admin_akses'])->name('api.datatable.setup.admin');
     Route::get('/setting-adm-account', [AdminController::class, 'index'])->name('admin.setup.adm.account');
     Route::PUT('/set-as-admin', [AdminController::class, 'update_role_to_admin'])->name('update.role.to.admin');
+    Route::get('/api-setup/dosen', [ApiDataTableController::class, 'api_datatable_dosen'])->name('api.datatable.setup.dosen');
 });
 
 Route::get('image/qrcode/{text}', [

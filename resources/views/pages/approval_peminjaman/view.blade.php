@@ -54,6 +54,19 @@
                         <h5><span>{{ $transaksi->tgl_wajib_kembali }}</span></h5>
                     </td>
                 </tr>
+                @if ($title == 'Detail Pengembalian Buku')
+                    <tr>
+                        <td>
+                            <h5><span>Denda</span></h5>
+                        </td>
+                        <td>
+                            <h5>:</h5>
+                        </td>
+                        <td>
+                            <h5><span>Rp. {{ $denda }}</span></h5>
+                        </td>
+                    </tr>
+                @endif
                 <tr>
                     <td>
                         <h5><span>Item</span></h5>
@@ -157,8 +170,10 @@
                     Swal.fire({
                         icon: "Error",
                         title: "Yeay...",
-                        text: "Berhasil menambahkan data!"
+                        text: "Peminjaman telah diterima dan stok telah diperbarui"
                     });
+                    // window.location.replace({{ route('data.return') }});
+                    window.location.href = "{{ route('data.return') }}";
                 }
             });
         }

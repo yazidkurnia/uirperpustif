@@ -73,7 +73,7 @@ class ApprovalTransactionController extends Controller
         // Mengambil data dari tabel book_stocks berdasarkan sekumpulan book_id
         $bookStocks = BookStock::whereIn('category_id', $categoryIds)->get();
         // cek apakah data transaksi telah di approve sebelumnya
-        if($getDataTransaksi->status_approval == 'Approved'){
+        if($getDataTransaksi->status_approval == 'Approved' && $getDataTransaksi->status_return == 'Approved'){
             return response()->json([
                 'success' => FALSE,
                 'message' => 'Gagal, data transaksi yang dipilih tidak dapat diapprove karena telah diapprove sebelumnya',
@@ -85,7 +85,16 @@ class ApprovalTransactionController extends Controller
         DB::beginTransaction();
     
         try {
-            $getDataTransaksi->status_approval = $request->status_approval;
+
+            // dd($getDataTransaksi);
+            if($getDataTransaksi->status_approval == 'Approved' && $getDataTransaksi->status_return == 'Waiting'){
+                $getDataTransaksi->status_approval = $request->status_approval;
+                $getDataTransaksi->status_return = 'Approved';
+            }else{
+                $getDataTransaksi->status_approval = $request->status_approval;
+                $getDataTransaksi->status_return = 'Waiting';
+            }
+
             $getDataTransaksi->save();
 
             // Update stock untuk setiap book_stock
@@ -98,7 +107,11 @@ class ApprovalTransactionController extends Controller
                 // var_dump($getDetailTransaksi);
                 var_dump($bookStock->book_id);
                 // Update total stock
-                $bookStock->total -= $jumlahDipinjam;
+                if($getDataTransaksi->status_approval == 'Approved' && $getDataTransaksi->status_return == 'Approved'){
+                $bookStock->total += $jumlahDipinjam;
+                } else {
+                    $bookStock->total -= $jumlahDipinjam;
+                }
                 // dd($bookStock->total);
                 // Simpan perubahan
                 $bookStock->save();
@@ -113,6 +126,7 @@ class ApprovalTransactionController extends Controller
                 'message' => 'Peminjaman telah diterima dan stok telah diperbarui',
                 'data'    => [],
             ], 200);
+            
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollBack();

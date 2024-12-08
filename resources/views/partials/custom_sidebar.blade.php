@@ -37,7 +37,7 @@
             </a>
         </li> --}}
         <li class="menu-item">
-            <a href="/unit" class="menu-link">
+            <a href="{{ route('data.return') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-archive-in"></i>
                 <div class="text-truncate" data-i18n="Front Pages">Pengembalian </div>
             </a>
@@ -69,6 +69,26 @@
                 </a>
             </li>
 
+
+            <li class="menu-header small text-uppercase"><span class="menu-header-text"> Stok Buku </span></li>
+            @if ($title == 'Data Stok Buku')
+                <li class="menu-item active">
+                @else
+                <li class="menu-item">
+            @endif
+            <!-- Unit -->
+            <li class="menu-item">
+                <a href="{{ route('data.book') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-store"></i>
+                    <div class="text-truncate" data-i18n="Front Pages">Data Buku </div>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="{{ route('stock.data') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-store"></i>
+                    <div class="text-truncate" data-i18n="Front Pages">Data Stok </div>
+                </a>
+            </li>
             {{-- khusus hak akses admin --}}
             <!-- Setting -->
             <li class="menu-header small text-uppercase"><span class="menu-header-text"> Setting </span></li>
@@ -85,7 +105,7 @@
             <ul class="menu-sub">
 
                 <li class="menu-item">
-                    <a href="/approval" class="menu-link">
+                    <a href="{{ route('list.lectures') }}" class="menu-link">
                         <div class="text-truncate" data-i18n="Without navbar"> Akun dosen </div>
                     </a>
                 </li>
@@ -105,19 +125,6 @@
                     </a>
                 </li>
             </ul>
-            </li>
-            <li class="menu-header small text-uppercase"><span class="menu-header-text"> Stok Buku </span></li>
-            @if ($title == 'Data Stok Buku')
-                <li class="menu-item active">
-                @else
-                <li class="menu-item">
-            @endif
-            <!-- Unit -->
-            <li class="menu-item">
-                <a href="{{ route('stock.data') }}" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-store"></i>
-                    <div class="text-truncate" data-i18n="Front Pages">Data Stok </div>
-                </a>
             </li>
         @endif
 

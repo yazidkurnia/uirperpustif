@@ -1,40 +1,43 @@
 <?php
 
-namespace App\Http\Controllers\Category;
+namespace App\Http\Controllers\Book;
 
+use App\Models\Book\Book;
 use Illuminate\Http\Request;
 use App\Models\Category\Category;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 
-class CategoryController extends Controller
+class BookController extends Controller
 {
     public function index(){
-        $data['title'] = 'Data Category';
-        $data['id_table'] = 'tbl_peminjaman';
+        $dataCategory = Category::get();
+
+        $data['data_kategori'] = $dataCategory;
+        $data['title'] = 'Data Buku';
+        $data['id_table'] = 'tbl_buku';
         $data['configHeaderTable'] = [
             'Action',
             'No',
-            'Nama Kategori',
+            'Judul Buku',
+            'Nama Penulis',
+            'Kategori',
+            'Penerbit',
         ];
-        return view('pages.category.index', $data);
+        // dd($dataCategory);
+
+        return view('pages.buku.index', $data);
     }
 
-    public function store(Request $request){
-        // lakukan pengecekan apakah nama kategori yang ditambahkan sudah ada
-        $getCategoryData = Category::where('category_name', $request->namaKategori)->first();
-        
-        if (!empty($getCategoryData)) {
-            return response()->json([
-                'success' => FALSE,
-                'message' => 'Maaf tidak berhasil melakukan pengambilan data kategori silahkan periksa kembali data yang anda inputkan.',
-                'data' => NULL,
-            ], 500);
-        }
-
-        Category::create([
-            'category_name' => $request->namaKategori
+    public function store(Request $request) {
+        Book::create([
+            'judul' => $request->judul_buku,
+            'penulis' => $request->nama_penulis,
+            'category_id' => $request->kategori,
+            'penerbit' => $request->penerbit,
+            'tahun_terbit' => $request->tahun_terbit,
+            'no_revisi' => $request->no_revisi
         ]);
 
         return response()->json([
@@ -45,16 +48,22 @@ class CategoryController extends Controller
     }
 
     public function update(Request $request){
+        // dd($request);
         $id = $request->id;
 
         $validId = $id != '' ? (int)Crypt::decryptString($id) ? (int)Crypt::decryptString($id) != 0 ? (int)Crypt::decryptString($id) : NULL : NULL : NULL;
+        $judulBuku = $request->judul;
+        $penulis = $request->penulis;
+        $penerbit = $request->penerbit;
+        $tahun_terbit = $request->tahun_terbit;
+        $kategori = $request->kategori;
+        $no_revisi = $request->no_revisi;
+        // dd($request);
         
-        $namaKategori = $request->nama_kategori;
-        
-        # ambil data category berdasarkan id yang dipilih
-        $dataCategoryById = Category::find($validId);
+        # ambil data buku berdasarkan id yang dipilih
+        $dataBookById = Book::find($validId);
 
-        if (empty($dataCategoryById)) {
+        if (empty($dataBookById)) {
             return response()->json([
                 'success' => FALSE,
                 'message' => 'Data yang akan dirubah tidak ditemukan.',
@@ -62,8 +71,13 @@ class CategoryController extends Controller
             ], 404);
         }
 
-        $dataCategoryById->category_name = $namaKategori;
-        $dataCategoryById->save();
+        $dataBookById->judul = $judulBuku;
+        $dataBookById->penulis = $penulis;
+        $dataBookById->penerbit = $penerbit;
+        $dataBookById->tahun_terbit = $tahun_terbit;
+        $dataBookById->category_id = $kategori;
+        $dataBookById->no_revisi = $no_revisi;
+        $dataBookById->save();
 
         if($validId == NULL) {
             return response()->json([
@@ -96,14 +110,14 @@ class CategoryController extends Controller
         }
     
         // Begin DB transaction
-        DB::beginTransaction();
+        // DB::beginTransaction();
         
         try {
-            // Find the category by ID
-            $dataCategoryById = Category::find($validId);
+            // Find the book by ID
+            $dataBookById = Book::find($validId);
     
-            // If the category is not found, return a 404 response
-            if (empty($dataCategoryById)) {
+            // If the book is not found, return a 404 response
+            if (empty($dataBookById)) {
                 return response()->json([
                     'success' => FALSE,
                     'message' => 'Data yang akan dihapus tidak ditemukan.',
@@ -111,8 +125,8 @@ class CategoryController extends Controller
                 ], 404);
             }
     
-            // Delete the category
-            $dataCategoryById->delete();
+            // Delete the book
+            $dataBookById->delete();
     
             // Commit the transaction
             DB::commit();
