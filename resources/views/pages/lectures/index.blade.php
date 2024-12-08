@@ -158,33 +158,33 @@
             })
         }
 
-        // function delete_account(idFromLevel, role) {
-        //     var csrfToken = $('meta[name="csrf-token"]').attr('content');
-        //     console.log(role);
-        //     $.ajax({
-        //         url: '{{ route('user.delete.account') }}',
-        //         type: 'DELETE',
-        //         data: {
-        //             id: idFromLevel,
-        //             role: role,
-        //             _token: csrfToken
-        //         },
-        //         success: function(response) {
-        //             Swal.fire(
-        //                 'Dihapus!',
-        //                 'Data telah berhasil dihapus.',
-        //                 'success'
-        //             );
-        //         },
-        //         error: function(xhr, status, error) {
-        //             Swal.fire(
-        //                 'Gagal!',
-        //                 'Terjadi kesalahan saat menghapus data.',
-        //                 'error'
-        //             );
-        //         }
-        //     });
-        // }
+        function delete_account(idFromLevel, role) {
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');
+            console.log(role);
+            $.ajax({
+                url: '{{ route('user.delete.account') }}',
+                type: 'DELETE',
+                data: {
+                    id: idFromLevel,
+                    role: role,
+                    _token: csrfToken
+                },
+                success: function(response) {
+                    Swal.fire(
+                        'Dihapus!',
+                        'Data telah berhasil dihapus.',
+                        'success'
+                    );
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire(
+                        'Gagal!',
+                        'Terjadi kesalahan saat menghapus data.',
+                        'error'
+                    );
+                }
+            });
+        }
 
         function confirm_to_delete(idFromLevel, role) {
             Swal.fire({
