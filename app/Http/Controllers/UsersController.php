@@ -62,27 +62,40 @@ class UsersController extends Controller
 
         // periksa apakah user dengan level mahasiswa dari id tersebut sudah memiliki akun
         $checkAccountById = User::where(['collagerid' => $validCollagerId, 'deleted_at' => NULL])->first();
-        if (!empty($checkAccountById)) {
-            return response()->json([
-                'success' => FALSE,
-                'message' => 'Maaf data yang dipilih telah memiliki akun!',
-                'data' => [],
-            ], 500);
-        }
-    
+        
+        // dd($validCollagerId);
         // Start a transaction
         DB::beginTransaction();
-    
+        
         try {
-            User::create([
-                'name' => $request->nama,
-                'email' => $request->email,
-                'password' => Hash::make('password'),
-                'roleid' => 3,
-                'collagerid' => $validCollagerId,
-                'email_verified_at' => date('Y-m-d H:i:s')
-            ]);
-    
+            if (empty($checkAccountById)) {
+                // dd($checkAccountById);
+                User::create([
+                    'name' => $request->nama,
+                    'email' => $request->email,
+                    'password' => Hash::make('password'),
+                    'roleid' => 3,
+                    'collagerid' => $validCollagerId,
+                    'email_verified_at' => date('Y-m-d H:i:s')
+                ]);
+                // dd($checkAccountById->email_verified_at);
+            }else{
+                // dd($checkAccountById);
+                if ($checkAccountById->email != $request->email){
+                    User::create([
+                        'name' => $request->nama,
+                        'email' => $request->email,
+                        'password' => Hash::make('password'),
+                        'roleid' => 3,
+                        'collagerid' => $validCollagerId,
+                        'email_verified_at' => date('Y-m-d H:i:s')
+                    ]);
+                }else{
+                    $checkAccountById->email_verified_at = date('Y-m-d H:i:s');
+                    $checkAccountById->save();
+                }
+            }
+
             // Commit the transaction
             DB::commit();
     

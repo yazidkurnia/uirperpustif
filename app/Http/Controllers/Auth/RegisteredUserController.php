@@ -23,6 +23,11 @@ class RegisteredUserController extends Controller
         return Inertia::render('Auth/Register');
     }
 
+    public function showRegisterForm(): \Illuminate\View\View
+    {
+        return view('pages.auth.register');
+    }
+
     /**
      * Handle an incoming registration request.
      *

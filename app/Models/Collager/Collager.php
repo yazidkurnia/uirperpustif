@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Collager extends Model
 {
     use HasFactory;
+    protected $fillable = ['npm', 'nama', 'email'];
 }

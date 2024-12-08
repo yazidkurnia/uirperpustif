@@ -24,6 +24,15 @@ class AuthenticatedSessionController extends Controller
         ]);
     }
 
+    public function showLoginForm(): \Illuminate\View\View
+    {
+        return view('pages.auth.index', [
+            'canResetPassword' => Route::has('password.request'),
+            'status' => session('status'),
+        ]);
+    }
+
+
     /**
      * Handle an incoming authentication request.
      */
