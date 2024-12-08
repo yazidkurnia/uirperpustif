@@ -12,9 +12,7 @@
                 {{-- <i class="bx bx-search bx-md"></i>
                 <input type="text" class="form-control border-0 shadow-none ps-1 ps-sm-2" placeholder="Search..."
                     aria-label="Search..." /> --}}
-                <h4 class="shadow-none ps-1 ps-sm-2 py-0 my-0 text-pretty text-primary">Sistem Informasi Perpustakaan
-                    Teknik
-                    Informatika UIR</h4>
+                <h4 class="shadow-none ps-1 ps-sm-2 py-0 my-0 text-pretty text-primary">E-tiflibrary</h4>
             </div>
         </div>
         <!-- /Search -->
