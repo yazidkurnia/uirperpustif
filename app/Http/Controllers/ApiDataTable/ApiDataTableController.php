@@ -164,12 +164,8 @@ class ApiDataTableController extends Controller
                                 Crypt::encryptString($list->id) .'\')">Cancel</button>' . 
                                 '</li>' .
                                 '<li>' .
-                                '<button type="button" class="btn btn-white text-left btn-sm" onclick="show_qr_image(\''. asset($list->qr_url) .'\')">View Qr Code</button>' . 
+                                '<a href="' . asset($list->qr_url) . '" target="_blank class="text-dark text-center"><span class="btn btn-sm bg-transparant">View Qr Code</span></a>' . 
                                 '</li>' .
-                                '<li>' .
-                                '<button type="button" class="btn btn-white text-left btn-sm" onclick="downloadQrImage(\''. asset($list->qr_url) .'\')">Download Qr Code</button>' . 
-                                '</li>' .
-                                // Hapus parameter 'mahasiswa'
                                 '</ul>' .
                                 '</div>' .
                                 '</td>',
@@ -190,10 +186,7 @@ class ApiDataTableController extends Controller
                                 Crypt::encryptString($list->id) .'\')">Cancel</button>' . 
                                 '</li>' .
                                 '<li>' .
-                                '<button type="button" class="btn btn-white text-left btn-sm" onclick="show_qr_image(\''. asset($list->qr_url) .'\')">View Qr Code</button>' . 
-                                '</li>' .
-                                '<li>' .
-                                '<button type="button" class="btn btn-white text-left btn-sm">Download Qr Code</button>' . 
+                                '<a href="' . asset($list->qr_url) . '" target="_blank class="text-dark text-center"><span class="btn btn-sm bg-transparant">View Qr Code</span></a>' . 
                                 '</li>' .
                                 // Hapus parameter 'mahasiswa'
                                 '</ul>' .
