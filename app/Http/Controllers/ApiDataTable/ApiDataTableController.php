@@ -66,10 +66,19 @@ class ApiDataTableController extends Controller
     }
 
     public function api_datatable_approve_peminjaman(){
-        $approvalPeminjaman = Transaction::select('transactions.id as transid', 'users.name', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval')->where('userid', Auth::user()->id)
-        ->join('users', 'users.id' , '=', 'transactions.userid')
-        ->where(['jenis_transaksi' => 'Peminjaman', 'status_approval' =>  'Waiting'])
-        ->get();
+        $approvalPeminjaman = [];
+        if (Auth::user()->roleid == 1) {
+            # code...
+            $approvalPeminjaman = Transaction::select('transactions.id as transid', 'users.name', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval')
+            ->join('users', 'users.id' , '=', 'transactions.userid')
+            ->where(['jenis_transaksi' => 'Peminjaman', 'status_approval' =>  'Waiting'])
+            ->get();
+        }else{
+            $approvalPeminjaman = Transaction::select('transactions.id as transid', 'users.name', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval')->where('userid', Auth::user()->id)
+            ->join('users', 'users.id' , '=', 'transactions.userid')
+            ->where(['jenis_transaksi' => 'Peminjaman', 'status_approval' =>  'Waiting'])
+            ->get();
+        }
         
         $data = [];
 
