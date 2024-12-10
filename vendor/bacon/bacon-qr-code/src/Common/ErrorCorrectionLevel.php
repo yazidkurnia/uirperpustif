@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace BaconQrCode\Common;
 
 use BaconQrCode\Exception\OutOfBoundsException;
-use DASPRiD\Enum\AbstractEnum;
+// use DASPRiD\Enum\AbstractEnum;
 
 /**
  * Enum representing the four error correction levels.
