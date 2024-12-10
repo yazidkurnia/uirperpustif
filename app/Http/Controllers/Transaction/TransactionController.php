@@ -21,6 +21,7 @@ use App\Http\Helpers\QrGeneratorHelper;
 use App\Models\Transaction\Transaction;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use App\Models\TransactionDetail\TransactionDetail;
+use TCPDF;
 
 class TransactionController extends Controller
 {
@@ -159,9 +160,35 @@ class TransactionController extends Controller
 
             $encryptedTransactionId = Crypt::encryptString($transaction->id);
 
-            $dataUri = $this->qrCodeHelper->generateQr("http://127.0.0.1:8000/detail-peminjaman/{$encryptedTransactionId}");
+            $style = array(
+                'border' => false, // No border
+                'vpadding' => 0,   // Vertical padding
+                'hpadding' => 0,   // Horizontal padding
+                'fgcolor' => array(0, 0, 0), // Foreground color (black)
+                'bgcolor' => array(255, 255, 255), // Background color (white)
+                'position' => 'S', // Positioning
+            );
 
-            $transaction->qr_url = $dataUri;
+            // Generate QR code
+            $qrCodeData = 'Transaction ID: ' . $transaction->id; // Data to encode in QR code
+            $pdf = new \TCPDF();
+            $pdf->AddPage();
+    
+            // Add title to the PDF
+            $pdf->SetFont('helvetica', 'B', 16);
+            $pdf->Cell(0, 10, 'Perpustakaan Digital Universitas Islam Riau', 0, 1, 'C'); // Centered title
+            $pdf->Cell(0, 10, 'Program Studi Teknik Informatika', 0, 1, 'C'); // Centered subtitle
+            $pdf->Ln(10); // Add a line break
+    
+            // Add QR code at the center of the page
+            $pdf->write2DBarcode($qrCodeData, 'QRCODE,H', 75, 50, 50, 50, [], 'N'); // Centered QR code
+    
+            // Define the path to save the PDF
+            $pdfFilePath = public_path('qrcodes/transaction_' . $transaction->id . '.pdf');
+            $pdf->Output($pdfFilePath, 'F'); // Save the PDF file
+    
+            // Store the URL of the saved PDF in the transaction
+            $transaction->qr_url = url('qrcodes/transaction_' . $transaction->id . '.pdf');
             $transaction->save();
 
             if (!empty($additionalBooks)) {
@@ -344,37 +371,4 @@ class TransactionController extends Controller
         }
     }
 
-    /**
-     * Documentaion function
-     *
-     * @param String $id
-     * @param $id [transaction id]
-     * @return void
-     */
-    public function generate_transaction_qr(String $id) {
-        $writer = new PngWriter();
-        // Buat instance dari QrCode
-        $qrCode = new QrCode(
-            data: 'Life is too short to be generating QR codes',
-            encoding: new Encoding('UTF-8'),
-            errorCorrectionLevel: ErrorCorrectionLevel::Low,
-            size: 300,
-            margin: 10,
-            roundBlockSizeMode: RoundBlockSizeMode::Margin,
-            foregroundColor: new Color(0, 0, 0),
-            backgroundColor: new Color(255, 255, 255),
-            // setContent: 'sdfsdfd'
-        );
-        
-        $result = $writer->write($qrCode);
-
-        // Save it to a file
-        $result->saveToFile('assets/generated_qr/qrcode.png'); //TODO:: ubah lokasi penyimpanan di folder public image
-
-        // Generate a data URI to include image data inline (i.e. inside an <img> tag)
-        $dataUri = $result->getDataUri();
-
-        return $dataUri;
-        // Atur header tipe konten
-    }
 }
