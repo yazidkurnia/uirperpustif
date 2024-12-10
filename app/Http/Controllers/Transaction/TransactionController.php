@@ -170,7 +170,7 @@ class TransactionController extends Controller
             );
 
             // Generate QR code
-            $qrCodeData = 'Transaction ID: ' . $transaction->id; // Data to encode in QR code
+            $qrCodeData = "http://192.168.175.227:8000/detail-peminjaman/{$encryptedTransactionId}"; // Data to encode in QR code
             $pdf = new \TCPDF();
             $pdf->AddPage();
     
@@ -188,7 +188,7 @@ class TransactionController extends Controller
             $pdf->Output($pdfFilePath, 'F'); // Save the PDF file
     
             // Store the URL of the saved PDF in the transaction
-            $transaction->qr_url = url('qrcodes/transaction_' . $transaction->id . '.pdf');
+            $transaction->qr_url = 'qrcodes/transaction_' . $transaction->id . '.pdf';
             $transaction->save();
 
             if (!empty($additionalBooks)) {
@@ -342,10 +342,12 @@ class TransactionController extends Controller
             // ambil data stock
             $getBookStock = BookStock::whereIn('category_id', $bookCategoryIds)->get();
             
-            foreach ($getBookStock as $list){
-                $list->total += 1;
-                $list->save();
-            }
+            // if ($transaction->status_approval == 'Approved') {
+            //     foreach ($getBookStock as $list){
+            //         $list->total += 1;
+            //         $list->save();
+            //     }
+            // }
 
             // Delete the transaction
             $transaction->delete();
