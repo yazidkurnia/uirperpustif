@@ -66,6 +66,56 @@ class UsersController extends Controller
         // dd($validCollagerId);
         // Start a transaction
         DB::beginTransaction();
+
+        // periksa apakah email sudah pernah digunakan 
+        $checkExistingAccountByEmail = User::where(['email' => $request->email])->first();
+
+        // dd($request->email);
+
+        if (!empty($checkExistingAccountByEmail) && $checkExistingAccountByEmail->email_verified_at == NULL) {
+             // Update email_verified_at dengan waktu saat ini
+        $checkExistingAccountByEmail->email_verified_at = now(); // Laravel's now() helper
+        $checkExistingAccountByEmail->save();
+        // Update the email_verified_at field for the user with the specified email
+        $updatedRows = DB::table('users')
+            ->where(['email'=>$request->email])
+            ->update(['email_verified_at' => now()]);
+
+        // dd($updatedRows);
+        // Check if any rows were updated
+        if ($updatedRows > 0) {
+            return response()->json([
+                'success' => TRUE,
+                'message' => 'Email verification timestamp updated successfully.',
+                'data' => [],
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => FALSE,
+                'message' => 'No changes made. The email may not exist or the timestamp was already set.',
+                'data' => [],
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => TRUE,
+            'message' => 'Selamat akun telah aktif.',
+            'data' => [],
+        ], 200);
+        }
+
+        // dd($checkExistingAccountByEmail->email_verified_at);
+
+        if($checkExistingAccountByEmail->email_verified_at == NULL){
+            $checkExistingAccountByEmail->email_verified_at = date('Y-m-d H:i:s');
+            $checkExistingAccountByEmail->save();
+
+            return response()->json([
+                'success' => TRUE,
+                'message' => 'Selamat akun telah aktif.',
+                'data' => [],
+            ], 200);
+        }
         
         try {
             if (empty($checkAccountById)) {
