@@ -86,6 +86,18 @@ class ApprovalTransactionController extends Controller
     
         try {
 
+            if ($request->status_approval == 'Reject'){
+                $getDataTransaksi->status_approval = $request->status_approval;
+                $getDataTransaksi->save();
+
+                return response()->json([
+                    'success' => TRUE,
+                    'message' => 'Permintaan peminjaman berhasil ditolak',
+                    'data'    => [],
+                ], 200);
+                die;
+            }
+
             // dd($getDataTransaksi);
             if($getDataTransaksi->status_approval == 'Approved' && $getDataTransaksi->status_return == 'Waiting'){
                 $getDataTransaksi->status_approval = $request->status_approval;

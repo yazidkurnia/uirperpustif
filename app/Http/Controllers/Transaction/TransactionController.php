@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transaction;
 
+use TCPDF;
 use DateTime;
 use App\Models\Book\Book;
 use Endroid\QrCode\QrCode;
@@ -21,7 +22,6 @@ use App\Http\Helpers\QrGeneratorHelper;
 use App\Models\Transaction\Transaction;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use App\Models\TransactionDetail\TransactionDetail;
-use TCPDF;
 
 class TransactionController extends Controller
 {
@@ -171,7 +171,7 @@ class TransactionController extends Controller
 
             // Generate QR code
             $qrCodeData = "http://192.168.175.227:8000/detail-peminjaman/{$encryptedTransactionId}"; // Data to encode in QR code
-            $pdf = new \TCPDF();
+            $pdf = new TCPDF();
             $pdf->AddPage();
     
             // Add title to the PDF
@@ -371,6 +371,11 @@ class TransactionController extends Controller
                 'data'    => [],
             ], 500);
         }
+    }
+
+    public function greet($name)
+    {
+        return response()->json(['message' => "Hello, $name!"]);
     }
 
 }
