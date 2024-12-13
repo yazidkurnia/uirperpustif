@@ -30,7 +30,7 @@ Route::get('/', function () {
 //     if (auth()->check() && auth()->user()->hasVerifiedEmail()) {
 //         return Inertia::render('Dashboard');
 //     }
-
+Route::get('/greet/{name}', [TransactionController::class, 'greet']);
 //     return redirect('/login');
 // })->middleware(['auth', 'verified'])->name('dashboard');
 // Route::middleware(['auth', 'verified', 'role'])->group(function () { //! dengan pengecekan role

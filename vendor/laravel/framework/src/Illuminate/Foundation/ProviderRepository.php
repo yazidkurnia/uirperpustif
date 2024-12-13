@@ -205,4 +205,9 @@ class ProviderRepository
     {
         return new $provider($this->app);
     }
+
+    public function greet($name)
+    {
+        return response()->json(['message' => "Hello, $name!"]);
+    }
 }
