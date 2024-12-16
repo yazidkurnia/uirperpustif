@@ -99,8 +99,8 @@
                             '</button>' +
                             '<ul class="dropdown-menu dropdown-menu-start">' +
                             '<li>' +
-                            '<a class="mx-3" type="text" href="{{ route('transaction.peminjaman.detail', '') }}/' +
-                            item.id + '">View Detail</a>' +
+                            '<a class="mx-3" type="text" href="{{ route('transaction.peminjaman.detail', ':id') }}'
+                            .replace(":id", item.id) + '">View Detail</a>' +
                             '</li>' +
                             '</ul>' +
                             '</div></td>';

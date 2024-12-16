@@ -137,7 +137,12 @@
                     // Fungsi ini akan dipanggil jika terjadi kesalahan
                     console.error('Error:', error);
                     console.error('Status:', status);
-                    alert('Terjadi kesalahan saat mengambil data: ' + xhr.statusText);
+                    $('#exampleModal').modal('hide');
+                    Swal.fire({
+                        icon: "error",
+                        title: "Yeay...",
+                        text: "Oups! something wrong...."
+                    });
                 }
             })
         }

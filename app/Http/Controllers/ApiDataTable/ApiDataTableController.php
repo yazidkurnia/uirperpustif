@@ -211,7 +211,9 @@ class ApiDataTableController extends Controller
     }
 
     public function api_datatable_book_stock(){
-        $dataBookStock = BookStock::get();
+        $dataBookStock = BookStock::select('book_stocks.*', 'categories.category_name as nama_kategori')
+        ->join('categories', 'categories.id','=', 'book_stocks.category_id')
+        ->get();
 
         $data = [];
         foreach ($dataBookStock as $list) {
@@ -220,7 +222,7 @@ class ApiDataTableController extends Controller
                 'kategori' => $list->nama_kategori,
                 'sisa_stok' => $list->total
             ];
-        }    
+        }
         
         return response()->json([
             'success' => TRUE,
@@ -330,7 +332,9 @@ class ApiDataTableController extends Controller
             'books.tahun_terbit',
             'books.no_revisi',
             'books.penerbit')
-            ->join('categories', 'categories.id', '=', 'category_id')->get();;
+            ->join('categories', 'categories.id', '=', 'category_id')
+            // ->join('book_stocks', 'book_stocks.book_id', '=', 'books.id')
+            ->get();
         $data=[];
 
         foreach ($dataBuku as $list) {
@@ -392,7 +396,7 @@ class ApiDataTableController extends Controller
             ->get();
         }
 
-        // var_dump($dataBukuPinjam);
+        // dd($dataBukuPinjam);
 
         $data = [];
         foreach ($dataBukuPinjam as $list) {
@@ -460,6 +464,7 @@ class ApiDataTableController extends Controller
                                 '</ul>' .
                                 '</div>' .
                                 '</td>',
+                                'id' => Crypt::encryptString($list->id),
                     'npm' => $list->unique_code,
                     'nama'=> $list->nama,
                     'tgl_pinjam' => $list->tgl_pinjam,

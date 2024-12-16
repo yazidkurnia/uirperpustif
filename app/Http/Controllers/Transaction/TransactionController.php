@@ -114,6 +114,16 @@ class TransactionController extends Controller
                 }
             }
         }
+        if(Auth::user()->roleid != 1)
+        {
+            if((count($decryptedBooks) + 1) > 2){
+                return response()->json([
+                    'success' => FALSE,
+                    'message' => 'Terjadi kesalahan, ketentuan hanya boleh meminjam 2 buku perjudul, total buku yang anda pinjam adalah ' . (count($decryptedBooks) + (int)$bookId),
+                    'data'    => [],
+                ], 500);        
+            }
+        }
 
         if (in_array($bookId, $decryptedBooks)) {
             $duplikatBook = Book::find($bookId);

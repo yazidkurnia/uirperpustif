@@ -215,13 +215,16 @@
                     no_revisi: noRevisi,
                 },
                 success: function(data) {
+                    $('#basicModal').modal('hide');
                     Swal.fire({
                         icon: "success",
                         title: "Yeay...",
                         text: "Berhasil menambahkan buku!"
                     });
+                    $('#dataTable tbody').empty();
+                    getData();
                     // $('#' + idTable).empty();
-                    $('#basicModal').modal('hide');
+
                 },
                 error: function(data) {
                     Swal.fire({
