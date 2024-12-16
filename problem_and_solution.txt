@@ -1,0 +1,7 @@
+problem:
+1. Class "Elibyy\TCPDF\ServiceProvider" not found
+
+Solution:
+1. Hapus require instalasi pada composer.json
+2. Hapus file vendor/composer/Eliby/TCPDF
+3. Instal ulang package
