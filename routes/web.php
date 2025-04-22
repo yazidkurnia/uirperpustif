@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Book\BookController;
 use App\Http\Controllers\Loan\LoanController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Stock\StockController;
 use App\Http\Controllers\Return\ReturnController;
 use App\Http\Controllers\Lecture\LectureController;
@@ -81,7 +82,8 @@ Route::middleware('auth')->group(function () {
     ############################################# all about stock ##################################################
     Route::get('/all-stock', [StockController::class, 'index'])->name('stock.data');
 
-    
+    ############################################# all about book ###################################################
+    Route::get('/buku',[ BookController::class, 'index'])->name('data.book');
 
 });
 
@@ -105,7 +107,7 @@ Route::middleware(['auth', 'role'])->group(function () {
     Route::delete('/delete/category', [CategoryController::class, 'destroy'])->name('category.destroy');
 
     ############################################# all about buku ##################################################
-    Route::get('/buku',[ BookController::class, 'index'])->name('data.book');
+
     Route::post('/tambah-buku', [BookController::class, 'store'])->name('book.store');
     Route::put('/update/book', [BookController::class, 'update'])->name('book.update');
     Route::delete('/delete/book', [BookController::class, 'destroy'])->name('book.destroy');
@@ -159,6 +161,7 @@ Route::get('/unauthorization', function() {
     return view('pages.general.unauthorization');
 })->name('user.unauthorization');
 
-
+##################################### route api#########################################
+Route::post('api/api-auth', [AuthApiController::class, 'sign_in'])->name('api.auth.sign_in');
 
 require __DIR__.'/auth.php';

@@ -10,6 +10,6 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
-        'userid', 'book_id', 'jenis_transaksi', 'tgl_pinjam', 'tgl_wajib_kembali', 'status_approval', 'qr_url'
+        'userid', 'book_id', 'jenis_transaksi', 'tgl_pinjam', 'tgl_wajib_kembali', 'status_approval', 'reject_note', 'qr_url'
     ];
 }

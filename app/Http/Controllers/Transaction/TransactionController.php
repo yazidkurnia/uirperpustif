@@ -49,8 +49,62 @@ class TransactionController extends Controller
             $list->stock_id = Crypt::encryptString($list->stock_id);
         }
 
+        $data['total_buku_keseluruhan'] = count(Book::all());
+
         $data['title'] = 'Daftar Buku';
         $data['book_list'] = $dataBuku;
+
+        // hitung total peminjaman waiting, approved, rejected
+        $data['total_peminjaman_pending']  = count(Transaction::where('status_approval', 'Waiting')->where('jenis_transaksi', 'Peminjaman')->get());
+        $data['total_peminjaman_approved'] = count(Transaction::where('status_approval', 'Approved')->where('jenis_transaksi', 'Peminjaman')->get());
+
+        $data['total_pengembalian_pending']  = count(Transaction::where('status_approval', 'Waiting')->where('jenis_transaksi', 'Pengembalian')->get());
+        $data['total_pengembalian_approved'] = count(Transaction::where('status_approval', 'Approved')->where('jenis_transaksi', 'Pengembalian')->get());
+        
+        # lakukan perhitunggan untuk mendapatkan data peminjaman buku perbulanannya
+        $getAllPeminjaman = Transaction::where('jenis_transaksi', 'Peminjaman')->get();
+        $getAllPengembalian = Transaction::where('jenis_transaksi', 'Pengembalian')->get();
+
+        $chartData = [
+            'Jan' => 0, 'Feb' => 0, 'Mar' => 0, 'Apr' => 0,
+            'May' => 0, 'Jun' => 0, 'Jul' => 0, 'Aug' => 0,
+            'Sep' => 0, 'Oct' => 0, 'Nov' => 0, 'Dec' => 0,
+        ];
+
+        $chartDataPengembalian = [
+            'Jan' => 0, 'Feb' => 0, 'Mar' => 0, 'Apr' => 0,
+            'May' => 0, 'Jun' => 0, 'Jul' => 0, 'Aug' => 0,
+            'Sep' => 0, 'Oct' => 0, 'Nov' => 0, 'Dec' => 0,
+        ];
+        
+        foreach ($getAllPeminjaman as $list) {
+            $month = date('M', strtotime($list->tgl_pinjam));
+            if (array_key_exists($month, $chartData)) {
+                $chartData[$month]++;
+            }
+        }
+        foreach ($getAllPengembalian as $list) {
+            $month = date('M', strtotime($list->tgl_wajib_kembali));
+            if (array_key_exists($month, $chartDataPengembalian)) {
+                $chartDataPengembalian[$month]++;
+            }
+        }
+        // Jika Anda ingin mengubah formatnya menjadi array yang lebih mudah digunakan untuk chart
+        // Jika Anda ingin mengubah formatnya menjadi array yang lebih mudah digunakan untuk chart
+        $formattedChartData = [
+            'labels' => array_keys($chartData), // Nama bulan
+            'data' => array_values($chartData), // Jumlah peminjaman per bulan
+            'data_pengembalian' => array_values($chartDataPengembalian)
+        ];
+
+        // Pastikan tidak ada nilai null dalam data
+        foreach ($formattedChartData['data'] as $key => $value) {
+            if ($value === null) {
+                $formattedChartData['data'][$key] = 0; // Ubah null menjadi 0
+            }
+        }
+        
+        $data['formattedChartData'] = $formattedChartData;
 
         return view('pages.peminjaman.index', $data);
     }
@@ -146,7 +200,7 @@ class TransactionController extends Controller
         $tglPengembalian = new DateTime($tglPeminjaman);
 
         // Menambahkan 5 hari
-        $tglPengembalian->modify('+5 days');
+        $tglPengembalian->modify('+7 days');
 
         if ($bookId == NULL){
             return response()->json([
@@ -180,7 +234,7 @@ class TransactionController extends Controller
             );
 
             // Generate QR code
-            $qrCodeData = "http://192.168.175.227:8000/detail-peminjaman/{$encryptedTransactionId}"; // Data to encode in QR code
+            $qrCodeData = "http://192.168.248.109:8000/detail-peminjaman/{$encryptedTransactionId}"; // Data to encode in QR code
             $pdf = new TCPDF();
             $pdf->AddPage();
     
@@ -243,9 +297,6 @@ class TransactionController extends Controller
     public function detail_peminjaman($id){
         $validTransactionId = $id != '' ? is_int((int)Crypt::decryptString($id)) ? (int)Crypt::decryptString($id) != 0 ? (int)Crypt::decryptString($id) : NULL : NULL : NULL;
         
-        
-        
-        
         // cek apakah id dai data yang dipilih tidak null
         if ($validTransactionId == NULL) {
             return redirect()->back()->withErrors(array('error', 'Data yang dipilih tidak ditemukan'));
@@ -260,8 +311,6 @@ class TransactionController extends Controller
         ->where('transactions.id', $validTransactionId)
         ->join('users', 'users.id', '=', 'transactions.userid')
         ->first();
-
-        // dd($dataTransaksi);
 
         if($dataTransaksi->status_approval == 'Approved'){
             $data['title'] = 'Detail Pengembalian Buku';
