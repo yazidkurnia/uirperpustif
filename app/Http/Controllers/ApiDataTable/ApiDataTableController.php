@@ -115,7 +115,7 @@ class ApiDataTableController extends Controller
         $dataBukuPinjam = [];
 
         if (Auth::user()->roleid == 3) {
-            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'collagers.npm as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval', 'transactions.qr_url')
+            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'collagers.npm as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval', 'transactions.qr_url', 'transactions.reject_note')
             ->join('users', 'users.id', '=', 'transactions.userid')
             ->join('collagers', 'collagers.id', '=', 'users.collagerid')
             ->where('userid', Auth::user()->id)
@@ -123,14 +123,16 @@ class ApiDataTableController extends Controller
         }
 
         if (Auth::user()->roleid == 2) {
-            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'lectures.nidn as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval', 'transactions.qr_url')->join('users', 'users.id', '=', 'transactions.userid')
+            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'lectures.nidn as unique_code', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval', 'transactions.qr_url', 'transactions.reject_note')->join('users', 'users.id', '=', 'transactions.userid')
             ->join('lectures', 'lectures.id', '=', 'users.lectureid')
             ->where('userid', Auth::user()->id)
             ->get();
         }
 
         if (Auth::user()->roleid == 1) {
-            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval', 'transactions.qr_url')->join('users', 'users.id', '=', 'transactions.userid')
+            $dataBukuPinjam = Transaction::select('transactions.id', 'users.name as nama', 'transactions.tgl_pinjam', 'transactions.tgl_wajib_kembali', 'transactions.status_approval', 'transactions.qr_url', 'transactions.reject_note')
+            ->join('users', 'users.id', '=', 'transactions.userid')
+            ->where('users.roleid', Auth::user()->roleid)
             ->get();
         }
 
@@ -174,9 +176,11 @@ class ApiDataTableController extends Controller
                     'tgl_pinjam' => $list->tgl_pinjam,
                     'tgl_wajib_kembali' => $list->tgl_wajib_kembali,
                     'tenggat' => $tenggatPengembalian->format("%R%a days"),
-                    'status_approval' => $statusApproval
+                    'status_approval' => $statusApproval,
+                    'alasan' => $list->reject_note
                 ];
             }else{
+                if($statusApproval == 'Approved'){
                 $data[] = [
                     'action' => '<td><div class="btn-group">' .
                                 '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
@@ -197,8 +201,35 @@ class ApiDataTableController extends Controller
                     'tgl_pinjam' => $list->tgl_pinjam,
                     'tgl_wajib_kembali' => $list->tgl_wajib_kembali,
                     'tenggat' => $tenggatPengembalian->format("%R%a days"),
-                    'status_approval' => $statusApproval
+                    'status_approval' => $statusApproval,
+                    'alasan' => $list->reject_note
                 ];
+                }else{
+                    $data[] = [
+                        'action' => '<td><div class="btn-group">' .
+                                    '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                                    '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                                    // '<li>' .
+                                    // '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="cancel_peminjaman(\'' .
+                                    // Crypt::encryptString($list->id) .'\')">Cancel</button>' . 
+                                    // '</li>' .
+                                    '<li>' .
+                                    '<a href="' . asset($list->qr_url) . '" target="_blank class="text-dark text-center"><span class="btn btn-sm bg-transparant">View Qr Code</span></a>' . 
+                                    '</li>' .
+                                    // Hapus parameter 'mahasiswa'
+                                    '</ul>' .
+                                    '</div>' .
+                                    '</td>',
+                        'npm' => $list->unique_code,
+                        'nama'=> $list->nama,
+                        'tgl_pinjam' => $list->tgl_pinjam,
+                        'tgl_wajib_kembali' => $list->tgl_wajib_kembali,
+                        'tenggat' => $tenggatPengembalian->format("%R%a days"),
+                        'status_approval' => $statusApproval,
+                        'alasan' => $list->reject_note ?? '-'
+                    ];
+                }
+
             }
   
         }
@@ -217,11 +248,43 @@ class ApiDataTableController extends Controller
 
         $data = [];
         foreach ($dataBookStock as $list) {
-            $data[]=[
-                'id' => Crypt::encryptString($list->id),
-                'kategori' => $list->nama_kategori,
-                'sisa_stok' => $list->total
-            ];
+            if(Auth::user()->roleid == 1){
+                $data[]=[
+                    'action' => '<td><div class="btn-group">' .
+                    '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                    '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                    '<li>' .
+                    '<button type="button" class="btn btn-white" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="set_value_toform(\'' .
+                    $list->id . '\', \'' . $list->npm . '\', \'' . $list->nama .
+                    '\', \'' . $list->email . '\')">Aktifasi Akun</button>' . '</li>' .
+                    '<li>' .
+                    '<button type="button" class="btn btn-white" onclick="confirm_to_delete(\'' .
+                    $list->id . '\', \'' . $list->role_name .
+                    '\')">Disaktif Akun</button>' . '</li>' .
+                    // Hapus parameter 'mahasiswa'
+                    '</ul>' .
+                    '</div>' .
+                    '</td>',
+                    'id' => Crypt::encryptString($list->id),
+                    'kategori' => $list->nama_kategori,
+                    'sisa_stok' => $list->total
+                ];
+            }else{
+                $data[]=[
+                    'action' => '<td><div class="btn-group">' .
+                    '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                    '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                    '<li>' .
+                    '<span class="px-3 align-left text-sm text-danger"><small>tidak memiliki akses</small></span>'.
+                    '</li>' .
+                    '</ul>' .
+                    '</div>' .
+                    '</td>',
+                    'id' => Crypt::encryptString($list->id),
+                    'kategori' => $list->nama_kategori,
+                    'sisa_stok' => $list->total
+                ];
+            }
         }
         
         return response()->json([
@@ -236,25 +299,40 @@ class ApiDataTableController extends Controller
         $data = [];
     
         foreach ($dataCategory as $list) {
-            $data[] = [
-                'action' => '<td><div class="btn-group">' .
-                '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
-                '<ul class="dropdown-menu dropdown-menu-start" style="">' .
-                '<li>' .
-                '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal">Cancel</button>' . 
-                '</li>' .
-                '<li>' .
-                '<a type="button" id="btnEdit" class="btn btn-white text-left btn-sm mx-5" onclick="edit(\'' . Crypt::encryptString($list->id) . '\', \'' .$list->category_name. '\')">'.'<i class="bx bxs-edit-alt"></i>'.' Edit</a>' . 
-                '</li>' .
-                '<li>' .
-                '<button type="button" class="btn btn-white text-left btn-sm" onclick="remove(\'' . Crypt::encryptString($list->id) . '\')">Delete</button>' . 
-                '</li>' .
-                '</ul>' .
-                '</div>' .
-                '</td>',
-                'id' => Crypt::encryptString($list->id),
-                'category_name' => $list->category_name
-            ];
+            if(Auth::user()->roleid == 1){
+                $data[] = [
+                    'action' => '<td><div class="btn-group">' .
+                    '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                    '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                    '<li>' .
+                    '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#basicModal">Cancel</button>' . 
+                    '</li>' .
+                    '<li>' .
+                    '<a type="button" id="btnEdit" class="btn btn-white text-left btn-sm mx-5" onclick="edit(\'' . Crypt::encryptString($list->id) . '\', \'' .$list->category_name. '\')">'.'<i class="bx bxs-edit-alt"></i>'.' Edit</a>' . 
+                    '</li>' .
+                    '<li>' .
+                    '<button type="button" class="btn btn-white text-left btn-sm" onclick="remove(\'' . Crypt::encryptString($list->id) . '\')">Delete</button>' . 
+                    '</li>' .
+                    '</ul>' .
+                    '</div>' .
+                    '</td>',
+                    'id' => Crypt::encryptString($list->id),
+                    'category_name' => $list->category_name
+                ];
+            }else{
+                $data[] = [
+                    'action' => '<td><div class="btn-group">' .
+                    '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                    '<li>' .
+                    '<span>No action allowed</span>' . 
+                    '</li>' .
+                    '</ul>' .
+                    '</div>' .
+                    '</td>',
+                    'id' => Crypt::encryptString($list->id),
+                    'category_name' => $list->category_name
+                ];
+            }
         }
     
         return response()->json([
@@ -331,35 +409,57 @@ class ApiDataTableController extends Controller
             'books.penulis',
             'books.tahun_terbit',
             'books.no_revisi',
-            'books.penerbit')
+            'books.penerbit',
+            'books.tahun_terbit')
             ->join('categories', 'categories.id', '=', 'category_id')
             // ->join('book_stocks', 'book_stocks.book_id', '=', 'books.id')
             ->get();
         $data=[];
 
         foreach ($dataBuku as $list) {
-            $data[]=[
-                'action' => '<td><div class="btn-group">' .
-                '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
-                '<ul class="dropdown-menu dropdown-menu-start" style="">' .
-                '<li>' .
-                '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#">Cancel</button>' . 
-                '</li>' .
-                '<li>' .
-                '<a type="button" id="btnEdit" class="btn btn-white text-left btn-sm mx-5" onclick="edit(\'' . Crypt::encryptString($list->book_id) . '\', \'' .$list->judul. '\', \'' .$list->penulis. '\', \'' .$list->penerbit. '\', \'' .$list->tahun_terbit. '\', \'' .$list->no_revisi. '\')">'.'<i class="bx bxs-edit-alt"></i>'.' Edit</a>' . 
-                '</li>' .
-                '<li>' .
-                '<button type="button" class="btn btn-white text-left btn-sm" onclick="remove(\'' . Crypt::encryptString($list->book_id) . '\')">Delete</button>' . 
-                '</li>' .
-                '</ul>' .
-                '</div>' .
-                '</td>', 
-                'id' => Crypt::encryptString($list->book_id),
-                'judul' => $list->judul,
-                'penulis' => $list->penulis,
-                'kategori' => $list->nama_kategori,
-                'penerbit' => $list->penerbit
-            ];
+            if(Auth::user()->roleid == 1){
+                $data[]=[
+                    'action' => '<td><div class="btn-group">' .
+                    '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                    '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                    '<li>' .
+                    '<button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal" data-bs-target="#">Cancel</button>' . 
+                    '</li>' .
+                    '<li>' .
+                    '<a type="button" id="btnEdit" class="btn btn-white text-left btn-sm mx-5" onclick="edit(\'' . Crypt::encryptString($list->book_id) . '\', \'' .$list->judul. '\', \'' .$list->penulis. '\', \'' .$list->penerbit. '\', \'' .$list->tahun_terbit. '\', \'' .$list->no_revisi. '\')">'.'<i class="bx bxs-edit-alt"></i>'.' Edit</a>' . 
+                    '</li>' .
+                    '<li>' .
+                    '<button type="button" class="btn btn-white text-left btn-sm" onclick="remove(\'' . Crypt::encryptString($list->book_id) . '\')">Delete</button>' . 
+                    '</li>' .
+                    '</ul>' .
+                    '</div>' .
+                    '</td>', 
+                    'id' => Crypt::encryptString($list->book_id),
+                    'judul' => $list->judul,
+                    'penulis' => $list->penulis,
+                    'kategori' => $list->nama_kategori,
+                    'penerbit' => $list->penerbit,
+                    'tahun_terbit' => $list->tahun_terbit
+                ];
+            }else{
+                $data[]=[
+                    'action' => '<td><div class="btn-group">' .
+                    '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' .
+                    '<ul class="dropdown-menu dropdown-menu-start" style="">' .
+                    '<li>' .
+                    '<span>Action is not allowed</span>' . 
+                    '</li>' .
+                    '</ul>' .
+                    '</div>' .
+                    '</td>', 
+                    'id' => Crypt::encryptString($list->book_id),
+                    'judul' => $list->judul,
+                    'penulis' => $list->penulis,
+                    'kategori' => $list->nama_kategori,
+                    'penerbit' => $list->penerbit,
+                    'tahun_terbit' => $list->tahun_terbit
+                ];
+            }
         }
 
         return response()->json([

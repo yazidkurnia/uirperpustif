@@ -24,6 +24,7 @@ class BookController extends Controller
             'Nama Penulis',
             'Kategori',
             'Penerbit',
+            'Tahun terbit'
         ];
         // dd($dataCategory);
 

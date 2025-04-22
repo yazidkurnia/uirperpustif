@@ -20,7 +20,8 @@ class LoanController extends Controller
             'Tanggal Pinjam',
             'Tanggal Pengembalian',
             'Sisa Waktu Pengembalian',
-            'Status'
+            'Status',
+            'Keterangan',
         ];
 
         return view('pages.loans.index', $data);

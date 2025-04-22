@@ -31,6 +31,8 @@ class AuthController extends Controller
                 $roleid = 3; 
             } elseif ($emailDomain === 'uir.ac.id') { 
                 $roleid = 2; 
+            } else {
+                return redirect()->back()->with('failed', 'Tidak dapat mendaftar dengan menggunakan selain email uir');
             }
 
             $getLectureData   = [];  

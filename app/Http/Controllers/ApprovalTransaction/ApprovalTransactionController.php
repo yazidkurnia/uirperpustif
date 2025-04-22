@@ -85,17 +85,11 @@ class ApprovalTransactionController extends Controller
         DB::beginTransaction();
     
         try {
-
-            if ($request->status_approval == 'Reject'){
-                $getDataTransaksi->status_approval = $request->status_approval;
+            if ($request->status_approval == 'Reject'){ 
+                $getDataTransaksi->status_approval = 'Reject';
+                $getDataTransaksi->reject_note = ''.$request->reject_note.'';
                 $getDataTransaksi->save();
 
-                return response()->json([
-                    'success' => TRUE,
-                    'message' => 'Permintaan peminjaman berhasil ditolak',
-                    'data'    => [],
-                ], 200);
-                die;
             }
 
             // dd($getDataTransaksi);
@@ -106,8 +100,6 @@ class ApprovalTransactionController extends Controller
                 $getDataTransaksi->status_approval = $request->status_approval;
                 $getDataTransaksi->status_return = 'Waiting';
             }
-
-            $getDataTransaksi->save();
 
             // Update stock untuk setiap book_stock
             foreach ($bookStocks as $bookStock) {
@@ -122,6 +114,13 @@ class ApprovalTransactionController extends Controller
                 if($getDataTransaksi->status_approval == 'Approved' && $getDataTransaksi->status_return == 'Approved'){
                 $bookStock->total += $jumlahDipinjam;
                 } else {
+                    if($bookStock->total == 0 || $bookStock->total < 0){
+                        return response()->json([
+                            'success' => FALSE,
+                            'message' => 'Gagal, terdapat stok buku yang tidak mencukupi silahkan periksa stok buku yang anda pinjam',
+                            'data'    => [],
+                        ], 500);
+                    }
                     $bookStock->total -= $jumlahDipinjam;
                 }
                 // dd($bookStock->total);
@@ -145,7 +144,7 @@ class ApprovalTransactionController extends Controller
     
             return response()->json([
                 'success' => FALSE,
-                'message' => 'Gagal memperbarui stok: ' . $e->getMessage(),
+                'message' => 'Something wrong! ' . $e->getMessage(),
                 'data'    => [],
             ], 500);
         }
