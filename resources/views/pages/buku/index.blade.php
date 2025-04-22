@@ -19,12 +19,13 @@
                         <div class="col-lg-4">
                             <input type="text" id="searchInput" class="form-control" placeholder="Search..." />
                         </div>
-                        <div class="col-lg-3 mx-0">
-                            <Button class="btn btn-primary" id="btnAdd" data-bs-toggle="modal"
-                                data-bs-target="#basicModal">+ Tambah
-                                data buku</Button>
-                        </div>
-
+                        @if (Auth::user()->roleid == 1)
+                            <div class="col-lg-3 mx-0">
+                                <Button class="btn btn-primary" id="btnAdd" data-bs-toggle="modal"
+                                    data-bs-target="#basicModal">+ Tambah
+                                    data buku</Button>
+                            </div>
+                        @endif
                     </div>
                 </div>
                 @include('partials.table')
@@ -164,6 +165,7 @@
                         row += '<td>' + item.penulis + '</td>';
                         row += '<td>' + item.kategori + '</td>';
                         row += '<td>' + item.penerbit + '</td>';
+                        row += '<td>' + item.tahun_terbit + '</td>';
 
                         // row += '<td>' + collager.email_verified_at + '</td>';
                         row += '</tr>';

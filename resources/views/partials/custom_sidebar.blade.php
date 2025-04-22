@@ -69,26 +69,6 @@
                 </a>
             </li>
 
-
-            <li class="menu-header small text-uppercase"><span class="menu-header-text"> Stok Buku </span></li>
-            @if ($title == 'Data Stok Buku')
-                <li class="menu-item active">
-                @else
-                <li class="menu-item">
-            @endif
-            <!-- Unit -->
-            <li class="menu-item">
-                <a href="{{ route('data.book') }}" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-store"></i>
-                    <div class="text-truncate" data-i18n="Front Pages">Data Buku </div>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="{{ route('stock.data') }}" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-store"></i>
-                    <div class="text-truncate" data-i18n="Front Pages">Data Stok </div>
-                </a>
-            </li>
             {{-- khusus hak akses admin --}}
             <!-- Setting -->
             <li class="menu-header small text-uppercase"><span class="menu-header-text"> Setting </span></li>
@@ -127,6 +107,24 @@
             </ul>
             </li>
         @endif
-
+        <li class="menu-header small text-uppercase"><span class="menu-header-text"> Stok Buku </span></li>
+        @if ($title == 'Data Stok Buku')
+            <li class="menu-item active">
+            @else
+            <li class="menu-item">
+        @endif
+        <!-- Unit -->
+        <li class="menu-item">
+            <a href="{{ route('data.book') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-store"></i>
+                <div class="text-truncate" data-i18n="Front Pages">Data Buku </div>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="{{ route('stock.data') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-store"></i>
+                <div class="text-truncate" data-i18n="Front Pages">Data Stok </div>
+            </a>
+        </li>
     </ul>
 </aside>

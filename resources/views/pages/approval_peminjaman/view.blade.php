@@ -142,6 +142,30 @@
 
         </div>
     </div>
+    <!-- Modal for rejection reason -->
+    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectModalLabel">Alasan Penolakan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="rejectForm">
+                        <div class="mb-3">
+                            <label for="reject_note" class="form-label">Alasan</label>
+                            <textarea class="form-control" id="reject_note" rows="3" required></textarea>
+                        </div>
+                        <input type="hidden" id="transaction_id" value="{{ $transaction_id }}">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" onclick="submitRejection()">Kirim</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function save() {
@@ -149,12 +173,56 @@
             var request_approval = $('#status_approval :selected').val();
             var csrfToken = $('meta[name="csrf-token"]').attr('content');
             console.log(transaction_id);
+
+            if (request_approval == 'Reject') {
+                $('#rejectModal').modal('show');
+            } else {
+                $.ajax({
+                    url: '{{ route('transaction.approval.peminjaman') }}',
+                    type: 'POST',
+                    data: {
+                        id: transaction_id,
+                        status_approval: request_approval,
+                        _token: csrfToken
+                    },
+                    success: function(data) {
+                        console.log(data);
+                        Swal.fire({
+                            icon: "success",
+                            title: "Yeay...",
+                            text: "Berhasil menambahkan data!"
+                        });
+                    },
+                    error: function(xhr, textStatus, error) {
+                        console.log(error);
+                        Swal.fire({
+                            icon: "Error",
+                            title: "Yeay...",
+                            text: "Peminjaman telah diterima dan stok telah diperbarui"
+                        });
+                        // window.location.replace({{ route('data.return') }});
+                        window.location.href = "{{ route('data.return') }}";
+                    }
+                });
+            }
+        }
+
+        function submitRejection() {
+            var transaction_id = $('#transaction_id').val();
+            var request_approval = $('#status_approval :selected').val();
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');
+            var reject_note = $('#reject_note').val();
+            console.log(transaction_id);
+
+            console.dir(reject_note);
+
             $.ajax({
                 url: '{{ route('transaction.approval.peminjaman') }}',
                 type: 'POST',
                 data: {
                     id: transaction_id,
-                    status_approval: request_approval,
+                    status_approval: 'Reject',
+                    reject_note: reject_note,
                     _token: csrfToken
                 },
                 success: function(data) {
@@ -172,8 +240,8 @@
                         title: "Yeay...",
                         text: "Peminjaman telah diterima dan stok telah diperbarui"
                     });
-                    // window.location.replace({{ route('data.return') }});
-                    window.location.href = "{{ route('data.return') }}";
+                    // // window.location.replace({{ route('data.return') }});
+                    // window.location.href = "{{ route('data.return') }}";
                 }
             });
         }

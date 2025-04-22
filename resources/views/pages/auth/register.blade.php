@@ -176,8 +176,16 @@
                             </a>
                         </div>
                         <!-- /Logo -->
-                        <h4 class="mb-1">Adventure starts here 🚀</h4>
-                        <p class="mb-6">Make your app management easy and fun!</p>
+                        @if (Session::has('failed'))
+                            <div class="alert alert-success">
+                                <ul>
+                                    <li>{!! Session::get('failed') !!}</li>
+                                </ul>
+                            </div>
+                        @endif
+
+                        <h4 class="mb-1">Temukan buku terbaik 🚀</h4>
+                        <p class="mb-6">Semua dapat dilakukan dalam satu waktu!</p>
                         <form id="formAuthentication" method="POST" class="mb-6"
                             action="{{ route('user.registration.store') }}">
                             @csrf

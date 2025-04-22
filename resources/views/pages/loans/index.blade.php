@@ -100,6 +100,7 @@
                         row += '<td>' + item.tgl_wajib_kembali + '</td>';
                         row += '<td>' + item.tenggat + '</td>';
                         row += '<td>' + item.status_approval + '</td>';
+                        row += '<td>' + item.alasan + '</td>';
                         // row += '<td>' + collager.email_verified_at + '</td>';
                         row += '</tr>';
                         $('#dataTable tbody').append(row);

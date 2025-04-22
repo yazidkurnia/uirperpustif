@@ -49,6 +49,7 @@
     <script>
         var idTable = {!! json_encode($id_table) !!}
         var csrfToken = $('meta[name="csrf-token"]').attr('content');
+        var roleid = {!! Auth::user()->roleid !!}
 
         function cancel_peminjaman(id) {
             $.ajax({
@@ -92,18 +93,27 @@
                     $.each(item, function(index, item) {
                         var iteration = index + 1; // Use index for row number
                         var row = '<tr>';
-                        row +=
-                            '<td><div class="btn-group">' +
-                            '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">' +
-                            '<box-icon name="cog" color="#ffffff"></box-icon>' +
-                            '</button>' +
-                            '<ul class="dropdown-menu dropdown-menu-start">' +
-                            '<li>' +
-                            '<a class="mx-3" type="text" href="{{ route('transaction.peminjaman.detail', ':id') }}'
-                            .replace(":id", item.id) + '">View Detail</a>' +
-                            '</li>' +
-                            '</ul>' +
-                            '</div></td>';
+
+                        if (roleid == 1) {
+                            row +=
+                                '<td><div class="btn-group">' +
+                                '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false">' +
+                                '<box-icon name="cog" color="#ffffff"></box-icon>' +
+                                '</button>' +
+                                '<ul class="dropdown-menu dropdown-menu-start">' +
+                                '<li>' +
+                                '<a class="mx-3" type="text" href="{{ route('transaction.peminjaman.detail', ':id') }}'
+                                .replace(":id", item.id) + '">View Detail</a>' +
+                                '</li>' +
+                                '</ul>' +
+                                '</div></td>';
+                        } else {
+                            row +=
+                                '<td><div class="btn-group">' +
+                                '<span class="mx-3" type="text"><small class="text-sm text-danger">Tidak memiliki akses</small></span>' +
+                                '</div></td>';
+                        }
+
                         row += '<td>' + iteration + '</td>';
                         row += '<td>' + item.npm + '</td>';
                         row += '<td>' + item.nama + '</td>';

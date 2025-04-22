@@ -85,22 +85,7 @@
                         //     '<td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="set_value_toform(\'' +
                         //     item.id + '\', \'' + item.npm + '\', \'' + item.nama +
                         //     '\', \'' + item.email + '\')">Ubah Role</button></td>';
-                        row +=
-                            '<td><div class="btn-group">' +
-                            '<button type="button" class="btn btn-primary btn-icon rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><box-icon name="cog" color="#ffffff"></box-icon></button>' +
-                            '<ul class="dropdown-menu dropdown-menu-start" style="">' +
-                            '<li>' +
-                            '<button type="button" class="btn btn-white" data-bs-toggle="modal" data-bs-target="#basicModal" onclick="set_value_toform(\'' +
-                            item.id + '\', \'' + item.npm + '\', \'' + item.nama +
-                            '\', \'' + item.email + '\')">Aktifasi Akun</button>' + '</li>' +
-                            '<li>' +
-                            '<button type="button" class="btn btn-white" onclick="confirm_to_delete(\'' +
-                            item.id + '\', \'' + item.role_name +
-                            '\')">Disaktif Akun</button>' + '</li>' +
-                            // Hapus parameter 'mahasiswa'
-                            '</ul>' +
-                            '</div>' +
-                            '</td>';
+                        row += item.action;
                         row += '<td>' + iteration + '</td>';
                         row += '<td>' + item.kategori + '</td>';
                         row += '<td>' + item.sisa_stok + '</td>';
