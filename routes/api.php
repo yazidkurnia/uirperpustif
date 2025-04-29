@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TransactionApi;
 use App\Http\Controllers\Api\TransactionDetailApi;
 use App\Http\Controllers\Api\V2\Auth\AuthApiController;
+use App\Http\Controllers\Api\v2\Books\BookApiController;
+use App\Http\Controllers\Api\v2\Books\BookDetailApiController;
+use App\Http\Controllers\Api\v2\Transactions\TransactionApiController;
+use App\Http\Controllers\Api\v2\Transactions\TransactionDetailApiController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -34,4 +38,24 @@ Route::get('/transaction-detail/{id}', [TransactionDetailApi::class, 'get_transa
  * --------------------------------------------------------------------------
  */ 
 
+# api auth v2
 Route::post('/v2/sign-in', [AuthApiController::class, 'sign_in']);
+
+
+# api book v2
+Route::get('/v2/best_five_book/{id}', [BookApiController::class, 'fetch_best_five_book']);
+Route::get('/v2/book/{id}', [BookApiController::class, 'fetch_all_book']);
+
+# api book detail v2
+Route::get('/v2/detail/{id}', [BookDetailApiController::class, 'fetch_data_byid']);
+
+# all about api transaction
+
+# get transactions all
+
+/**
+ * @param userid String (encrypted int)
+ */
+Route::get('/v2/get/status-transaksi/{id}', [TransactionApiController::class, 'get_status_transaction']);
+Route::get('/v2/transaction-detail/{id}', [TransactionDetailApiController::class, 'get_detail_transaction']);
+Route::post('/v2/send-data', [TransactionApiController::class, 'store_transaction']);
